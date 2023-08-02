@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "question": "What is packhouse ?",
+    "answer": "Next tattooed toast hot bun jianbing yuccie keytar LaCroix pitchfork. Truck pickled chicharrones bodega yr hoodie direct literally hexagon.",
+    "category": "General"
+  },
+  {
+    "id": 2,
+    "question": "What is packhouse ?",
+    "answer": "Tango uses a proprietary algorithm to match you with compatible singles. The algorithm takes into account your personality profile, interests, and goals.",
+    "category": "Matching"
+  },
+  {
+    "id": 3,
+    "question": "What is packhouse ?",
+    "answer": "Tango is different from dating apps/sites in a few ways. First, Tango uses a more personalized approach to matching. Second, Tango offers more comprehensive personality profiles. Third, Tango has a team of matchmakers who are available to help you find your perfect match.",
+    "category": "Comparison"
+  },
+  {
+    "id": 4,
+    "question": "What is packhouse ?",
+    "answer": "Tango’s success rate is over 90%. This means that over 90% of our clients find a compatible match within 6 months of joining Tango.",
+    "category": "Success"
+  },
+  {
+    "id": 5,
+    "question": "What is packhouse ?",
+    "answer": "Yes, you can switch matchmakers at any time. If you are not happy with your current matchmaker, simply contact our customer support team and they will help you find a new one.",
+    "category": "Matchmaking"
+  }
+]
