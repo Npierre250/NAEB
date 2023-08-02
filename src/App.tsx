@@ -3,22 +3,26 @@ import { useState } from "react";
 import FAQ from "./data/fqa.json";
 import Arrow from "./components/vectors/Arrow";
 import ArrowLine from "./components/vectors/ArrowLine";
+import CircleSvg, { CircleSvgRight } from "./components/vectors/Circle";
+import BgHero from "./components/vectors/BgHero";
 
 function App() {
   const [active, setActive] = useState(1);
   return (
     <main>
-      <section className="bg-[#287BCB] h-[850px] relative">
-        <img
-          src="/bg.png"
-          alt="bg"
-          className="absolute left-0 right-0 mx-auto bottom-0"
-        />
+      <section className="bg-[#287BCB] pb-20 md:pb-0 md:h-[850px] relative">
+        <div className="absolute left-0 right-0 mx-auto bottom-0 w-fit z-50 hidden md:block">
+          <BgHero />
+        </div>
+        <CircleSvg className="absolute bottom-0 left-0 hidden md:block" />
+        <CircleSvgRight className="absolute bottom-0 right-0 hidden md:block " />
         <div className="max-w-7xl mx-auto py-8 flex justify-between items-center px-3">
           <button>
             <img src="/logo.png" alt="logo" width={218.25} height={53} />
+
+            {/* <LogoSvg /> */}
           </button>
-          <div className="flex gap-12">
+          <div className=" hidden gap-12 md:flex">
             {["Packouse", "How it works", "Log in", "Sign up"].map(
               (val, index) => {
                 return (
@@ -53,7 +57,7 @@ function App() {
           <mark className="bg-transparent text-[#287BCB]">Pack house </mark>{" "}
           work
         </h2>
-        <div className="grid grid-cols-2 gap-[200px] mt-20">
+        <div className="grid md:grid-cols-2 gap-20 md:gap-[200px] mt-20">
           <div className="grid gap-16">
             <div className="flex flex-col gap-4">
               <img
@@ -166,17 +170,18 @@ function App() {
           </div>
         </div>
       </section>
-      <footer className="bg-[#287BCB] pt-12">
+      <footer className="bg-[#287BCB] pt-12 relative">
         <div className="max-w-6xl mx-auto px-3">
-          <div className="flex justify-between">
+          <div className="flex justify-between flex-wrap">
             <div>
               <button>
                 <img src="/logo.png" alt="logo" width={218.25} height={53} />
+                {/* <LogoSvg /> */}
               </button>
             </div>
-            <div className="flex gap-2 w-fit justify-end">
-              <div className="flex flex-col gap-2 w-1/2">
-                <p className="w-[70%] text-white">
+            <div className="flex gap-2 w-fit md:justify-end flex-wrap">
+              <div className="flex flex-col gap-2 md:w-1/2">
+                <p className="md:w-[70%] text-white">
                   Reach out to us to know how our service can help you to reach
                   to your goals
                 </p>
@@ -184,7 +189,7 @@ function App() {
               </div>
               <div className="flex gap-2 flex-col">
                 <h4 className="text-[#00BFD3] font-semibold">Useful links</h4>
-                <div className="flex gap-4">
+                <div className="flex gap-4 flex-wrap">
                   {["Home", "How it works", "Application", "Faq"].map(
                     (item, index) => {
                       return (
