@@ -1,4 +1,4 @@
-import { z } from "Zod";
+import { z } from "zod";
 export const applicationSchema = z.object({
   tinNumber: z.string().min(1, {
     message: "Please provide a valid TIN number.",

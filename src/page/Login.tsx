@@ -4,7 +4,7 @@ import FormStep from "../components/vectors/FormStep";
 import CircleSvg from "../components/vectors/Circle";
 import Input from "../components/ui/Input";
 import { Link } from "react-router-dom";
-import { z } from "Zod";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Logo from "../components/ui/Logo";

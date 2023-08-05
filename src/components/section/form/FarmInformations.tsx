@@ -2,7 +2,7 @@
 import { useForm } from "react-hook-form";
 import Input, { DisableIInput } from "../../ui/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "Zod";
+import { z } from "zod";
 import { useContext } from "react";
 import { ApplicatioinContext } from "../../../context/Application";
 

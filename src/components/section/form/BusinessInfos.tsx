@@ -3,7 +3,7 @@ import classNames from "classnames";
 import Input from "../../ui/Input";
 import Dropzone from "react-dropzone";
 import DocumentSVG from "../../vectors/DocumentSvg";
-import { z } from "Zod";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useContext, useState } from "react";
