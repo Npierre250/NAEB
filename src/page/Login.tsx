@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { z } from "Zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Logo from "../components/ui/Logo";
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(50),
@@ -28,9 +29,7 @@ export default function Login() {
     <div className="flex h-screen">
       <div className="relative bg-[#287BCB] hidden md:block md:max-w-lg w-full">
         <div className="w-[80%] mx-auto mt-10">
-          <button>
-            <img src="/logo.png" alt="logo" width={218.25} height={53} />
-          </button>
+          <Logo />
           <div className="flex relative z-50 max-w-[320px] h-full mt-32">
             <div>
               <FormStep className="w-[126px] h-[332px]" />

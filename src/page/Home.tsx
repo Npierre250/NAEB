@@ -5,9 +5,34 @@ import Arrow from "../components/vectors/Arrow";
 import ArrowLine from "../components/vectors/ArrowLine";
 import CircleSvg, { CircleSvgRight } from "../components/vectors/Circle";
 import BgHero from "../components/vectors/BgHero";
+import { NavLink } from "react-router-dom";
+import Logo from "../components/ui/Logo";
 
 function Home() {
   const [active, setActive] = useState(1);
+  const menu = [
+    {
+      id: 1,
+      name: "Packouse",
+      link: "/application",
+    },
+    {
+      id: 2,
+      name: "How it works",
+      link: "#work",
+      hash: true,
+    },
+    {
+      id: 3,
+      name: "Log in",
+      link: "/login",
+    },
+    {
+      id: 4,
+      name: "Sign up",
+      link: "#",
+    },
+  ];
   return (
     <main>
       <section className="bg-[#287BCB] pb-20 md:pb-0 md:h-[850px] relative">
@@ -17,24 +42,30 @@ function Home() {
         <CircleSvg className="absolute bottom-0 left-0 hidden md:block" />
         <CircleSvgRight className="absolute bottom-0 right-0 hidden md:block " />
         <div className="max-w-7xl mx-auto py-8 flex justify-between items-center px-3">
-          <button>
-            <img src="/logo.png" alt="logo" width={218.25} height={53} />
-
-            {/* <LogoSvg /> */}
-          </button>
+          <Logo />
           <div className=" hidden gap-12 md:flex">
-            {["Packouse", "How it works", "Log in", "Sign up"].map(
-              (val, index) => {
+            {menu.map((val) => {
+              if (val.hash) {
                 return (
-                  <button
+                  <a
+                    href={val.link}
                     className="text-white font-bold text-base hover:underline"
-                    key={index}
+                    key={val.id}
                   >
-                    {val}
-                  </button>
+                    {val.name}
+                  </a>
                 );
               }
-            )}
+              return (
+                <NavLink
+                  to={val.link}
+                  className="text-white font-bold text-base hover:underline"
+                  key={val.id}
+                >
+                  {val.name}
+                </NavLink>
+              );
+            })}
           </div>
         </div>
         <div className="flex justify-center items-center flex-col md:w-[40%] mx-auto mt-14 gap-6">
@@ -51,7 +82,7 @@ function Home() {
           </button>
         </div>
       </section>
-      <section className="max-w-6xl mx-auto mt-24 px-3">
+      <section className="max-w-6xl mx-auto mt-24 px-3" id="work">
         <h2 className="text-3xl font-extrabold text-center max-w-xs mx-auto">
           How online{" "}
           <mark className="bg-transparent text-[#287BCB]">Pack house </mark>{" "}
