@@ -47,11 +47,9 @@ export default function BusinessInfos(props: any) {
       licenceCopy: files,
     });
     if (validationResult.success) {
-      // The object is valid, you can handle the submission here
       console.log("User object is valid:", validationResult.data);
       next();
     } else {
-      // The object is invalid, update the errors state
       setErrors(validationResult.error.flatten().fieldErrors);
       console.log("User object is invalid:", validationResult.error.flatten());
     }
@@ -88,11 +86,11 @@ export default function BusinessInfos(props: any) {
             </label>
             <section
               className={classNames({
-                "bg-[#E8E8EA] flex justify-center items-center h-[107px] rounded-2xl border border-transparent transition-all cursor-pointer":
+                "bg-[#E8E8EA] flex justify-center items-center h-[107px] rounded-2xl border transition-all cursor-pointer":
                   true,
+                "border-black": isDragAccept || isFocused,
                 "border-red-500": error,
                 "border-[#287BCB]": isDragAccept,
-                "border-black": isDragAccept || isFocused,
               })}
             >
               <div

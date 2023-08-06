@@ -110,16 +110,19 @@ export default function Login() {
                 Forgot password?
               </Link>
 
-              <button className="py-3 bg-[#287BCB] px-9 rounded-2xl text-white w-full mt-3">
+              <button
+                type="submit"
+                className="py-3 bg-[#287BCB] px-9 rounded-2xl text-white w-full mt-3"
+              >
                 Log in
               </button>
             </div>
           </form>
         </div>
         <p className="absolute bottom-12">
-          If yo don’t have account?{" "}
+          If you don’t have account?{" "}
           <Link
-            to={"#"}
+            to={"/signup"}
             className="text-[#287BCB] inline-block ml-1 hover:underline text-center mx-auto
             "
           >

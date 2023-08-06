@@ -5,7 +5,7 @@ import Arrow from "../components/vectors/Arrow";
 import ArrowLine from "../components/vectors/ArrowLine";
 import CircleSvg, { CircleSvgRight } from "../components/vectors/Circle";
 import BgHero from "../components/vectors/BgHero";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import Logo from "../components/ui/Logo";
 
 function Home() {
@@ -30,7 +30,31 @@ function Home() {
     {
       id: 4,
       name: "Sign up",
-      link: "#",
+      link: "/signup",
+    },
+  ];
+  const footerMenu = [
+    {
+      id: 1,
+      name: "Home",
+      link: "/",
+    },
+    {
+      id: 2,
+      name: "How it works",
+      link: "#work",
+      hash: true,
+    },
+    {
+      id: 3,
+      name: "Application",
+      link: "/application",
+    },
+    {
+      id: 4,
+      name: "Faq",
+      link: "#faq",
+      hash: true,
     },
   ];
   return (
@@ -77,9 +101,12 @@ function Home() {
             <mark className="bg-transparent text-[#00BFD3]">Quality</mark> and
             Gain Trust - Schedule Your Food Check Online Today!"
           </h1>
-          <button className="py-3 bg-[#00BFD3] px-9 rounded-2xl text-white">
+          <Link
+            to="/login"
+            className="py-3 bg-[#00BFD3] px-9 rounded-2xl text-white"
+          >
             Get started
-          </button>
+          </Link>
         </div>
       </section>
       <section className="max-w-6xl mx-auto mt-24 px-3" id="work">
@@ -103,9 +130,12 @@ function Home() {
                 to work with our online packouse services you have to be member
                 of Naeb if you are not alread apply here{" "}
               </p>
-              <button className="py-3 bg-[#287BCB] px-9 w-fit rounded-2xl text-white">
+              <Link
+                to="/application"
+                className="py-3 bg-[#287BCB] px-9 w-fit rounded-2xl text-white"
+              >
                 Apply now
-              </button>
+              </Link>
             </div>
             <div className="flex flex-col gap-4">
               <img
@@ -120,9 +150,12 @@ function Home() {
                 start scheduling your deliveries by using our scheduling
                 calendar layout by clicking on date you fill an easy form
               </p>
-              <button className="py-3 bg-[#287BCB] px-9 w-fit rounded-2xl text-white">
+              <Link
+                to="/login"
+                className="py-3 bg-[#287BCB] px-9 w-fit rounded-2xl text-white"
+              >
                 Start now
-              </button>
+              </Link>
             </div>
           </div>
           <div className="flex flex-col gap-4 m-auto">
@@ -137,13 +170,16 @@ function Home() {
             <p>
               Use your Naeb application CODE to have account online pachkhouse
             </p>
-            <button className="py-3 bg-[#287BCB] px-9 rounded-2xl text-white w-fit">
+            <Link
+              to="/signup"
+              className="py-3 bg-[#287BCB] px-9 rounded-2xl text-white w-fit"
+            >
               Register now
-            </button>
+            </Link>
           </div>
         </div>
       </section>
-      <section className="bg-[#F6FBFF] py-12 mt-20">
+      <section className="bg-[#F6FBFF] py-12 mt-20" id="faq">
         <div className="max-w-6xl mx-auto px-3">
           <div className="grid md:grid-cols-2 gap-20">
             <div className="md:w-3/4">
@@ -207,7 +243,6 @@ function Home() {
             <div>
               <button>
                 <img src="/logo.png" alt="logo" width={218.25} height={53} />
-                {/* <LogoSvg /> */}
               </button>
             </div>
             <div className="flex gap-2 w-fit md:justify-end flex-wrap">
@@ -216,21 +251,40 @@ function Home() {
                   Reach out to us to know how our service can help you to reach
                   to your goals
                 </p>
-                <p className="text-[#00BFD3]">Onlinepackhouse@gmail.com</p>
+                <Link
+                  to={"mailto:onlinepackhouse@gmail.com"}
+                  className="text-[#00BFD3]"
+                >
+                  Onlinepackhouse@gmail.com
+                </Link>
               </div>
               <div className="flex gap-2 flex-col">
                 <h4 className="text-[#00BFD3] font-semibold">Useful links</h4>
                 <div className="flex gap-4 flex-wrap">
-                  {["Home", "How it works", "Application", "Faq"].map(
-                    (item, index) => {
+                  {footerMenu.map((item) => {
+                    if (item.hash) {
                       return (
-                        <button key={index} className="flex gap-2 items-center">
-                          <span className="text-white w-fit">{item}</span>
+                        <a
+                          href={item.link}
+                          key={item.id}
+                          className="flex gap-2 items-center"
+                        >
+                          <span className="text-white w-fit">{item.name}</span>
                           <ArrowLine className="w-5 stroke-white" />
-                        </button>
+                        </a>
                       );
                     }
-                  )}
+                    return (
+                      <Link
+                        to={item.link}
+                        key={item.id}
+                        className="flex gap-2 items-center"
+                      >
+                        <span className="text-white w-fit">{item.name}</span>
+                        <ArrowLine className="w-5 stroke-white" />
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             </div>
