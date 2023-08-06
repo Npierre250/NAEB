@@ -74,7 +74,7 @@ export default function Login() {
         </div>
         <CircleSvg className="absolute bottom-0 left-0 hidden md:block" />
       </div>
-      <div className="w-full h-full flex items-center justify-center relative">
+      <div className="w-full h-full flex items-center justify-center relative flex-col sm:flex-row">
         <div className="max-w-md w-full px-4">
           <h3 className="text-4xl font-bold text-[#287BCB] mb-1">Welcome!</h3>
           <span className="text-[#575757] font-light">
@@ -119,7 +119,7 @@ export default function Login() {
             </div>
           </form>
         </div>
-        <p className="absolute bottom-12">
+        <p className="sm:absolute bottom-12 mt-2 sm:mt-0">
           If you don’t have account?{" "}
           <Link
             to={"/signup"}

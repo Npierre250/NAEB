@@ -65,7 +65,7 @@ export default function Signup() {
         </div>
         <CircleSvg className="absolute bottom-0 left-0 hidden md:block" />
       </div>
-      <div className="w-full h-full flex items-center justify-center relative">
+      <div className="w-full h-full flex items-center flex-col sm:flex-row justify-center relative">
         <div className="max-w-md w-full px-4">
           <h3 className="text-4xl font-bold text-[#287BCB] mb-1">
             {step === 2 ? "Create account" : "Member verification"}
@@ -77,7 +77,7 @@ export default function Signup() {
           {step === 1 && <MemberVerificationInput />}
           {step === 2 && <CreateAccount />}
         </div>
-        <p className="absolute bottom-3">
+        <p className="sm:absolute bottom-3 mt-2 sm:mt-0">
           If you have account?{" "}
           <Link
             to={"/login"}
