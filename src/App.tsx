@@ -8,6 +8,9 @@ import Home from "./page/Home";
 import Application from "./page/Application";
 import Login from "./page/Login";
 import Signup from "./page/Signup";
+import NotFound from "./page/NotFound";
+import DashboardLayout from "./components/section/form/layout/DashboardLayout";
+import DashboardHome from "./page/dashboard/DashboardHome";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -16,6 +19,10 @@ const router = createBrowserRouter(
       <Route path="/application" element={<Application />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/dashboard" element={<DashboardLayout />}>
+        <Route index element={<DashboardHome />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
     </>
   )
 );
