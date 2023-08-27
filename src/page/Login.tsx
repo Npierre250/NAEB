@@ -11,7 +11,7 @@ import { useState } from "react";
 import { useAuth } from "../context/userManager";
 const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8).max(50),
+  password: z.string().min(6).max(50),
 });
 type ValidationSchema = z.infer<typeof loginSchema>;
 

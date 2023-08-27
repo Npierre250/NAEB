@@ -1,10 +1,12 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import Avatar from "../../../ui/Avatar";
 import ArrowCircle from "../../../vectors/ArrowCircle";
 import Notificatioin from "../../../vectors/Notificatioin";
 import Home, { Calling, Delival, Profile } from "../../../vectors/Home";
 import classNames from "classnames";
 import Schedule from "../../../vectors/Schedule";
+import { useAuth } from "../../../../context/userManager";
+import { useEffect } from "react";
 
 const MENUP_ONE = [
   {
@@ -42,6 +44,19 @@ const MENUP_TWO = [
 ];
 
 export default function DashboardLayout() {
+  const { user }: any = useAuth();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (user === null) navigate("/");
+  }, [user]);
+  if (user === false) {
+    return (
+      <div className="flex items-center justify-center w-full h-screen bg-[#F6FAFF]">
+        <img src="/loading.gif" alt="" width={100} height={100} />
+      </div>
+    );
+  }
+  if (user) console.log(user);
   return (
     <main className="bg-[#F6FAFF] w-full h-screen overflow-hidden">
       <div className="bg-white">
@@ -58,7 +73,7 @@ export default function DashboardLayout() {
           <div className="flex items-center gap-12">
             <Notificatioin className="w-6 h-6" />
             <div className="flex items-center gap-4">
-              <Avatar title="Mwizera aime" subTitle="Kicukiro" />
+              <Avatar title={user.email.split("@")[0]} subTitle="Kicukiro" />
               <ArrowCircle />
             </div>
           </div>

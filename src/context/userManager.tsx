@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../supabase/client";
 
 const AuthContext = createContext({});
@@ -7,7 +7,7 @@ const AuthContext = createContext({});
 export const useAuth = () => useContext(AuthContext);
 
 const AuthProvider = ({ children }: any) => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<any>(false);
   const signup = async ({
     email,
     password,
@@ -41,6 +41,13 @@ const AuthProvider = ({ children }: any) => {
     }
     setUser(data);
   };
+  async function getUser() {
+    const { data } = await supabase.auth.getUser();
+    setUser(data.user);
+  }
+  useEffect(() => {
+    getUser();
+  }, []);
   return (
     <AuthContext.Provider value={{ user, setUser, signup, login }}>
       {children}
