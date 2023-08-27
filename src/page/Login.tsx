@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import classNames from "classnames";
 import FormStep from "../components/vectors/FormStep";
 import CircleSvg from "../components/vectors/Circle";

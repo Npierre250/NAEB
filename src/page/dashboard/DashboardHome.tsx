@@ -1,10 +1,19 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import CalendarButton from "../../components/ui/CalendarButton";
 import Plus from "../../components/vectors/Plus";
 import classNames from "classnames";
+import Close from "../../components/vectors/Close";
+import { useOnClickOutside } from "usehooks-ts";
 
 export default function DashboardHome() {
   const [upcoming, setUpcoming] = useState("Confirmed");
+  const [addMenu, setAddMenu] = useState(false);
+  const ref = useRef(null);
+
+  const handleClickOutside = () => {
+    setAddMenu(false);
+  };
+  useOnClickOutside(ref, handleClickOutside);
   return (
     <div className="flex gap-5 p-5">
       <div className="flex-1 flex flex-col gap-5">
@@ -45,9 +54,56 @@ export default function DashboardHome() {
       </div>
       <div className="min-w-[322px]">
         <div className="w-full bg-white h-full rounded-lg px-6 py-5">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between relative">
             <span>Upcoming deliveries</span>
-            <Plus />
+            <button onClick={() => setAddMenu(true)}>
+              <Plus />
+            </button>
+            {addMenu && (
+              <div
+                ref={ref}
+                className="absolute top-10 z-50 -left-4 w-[300px] flex flex-col gap-2 bg-white rounded-2xl shadow-2xl px-4 py-4 overflow-auto"
+              >
+                <div className="flex justify-between mb-3">
+                  <span>Add deliveries</span>
+                  <button onClick={() => setAddMenu(false)}>
+                    <Close />
+                  </button>
+                </div>
+                <input
+                  className="border px-2 py-1.5 rounded-lg placeholder:text-black/70 outline-none"
+                  placeholder="Add product title"
+                />
+                <input
+                  className="border px-2 py-1.5 rounded-lg placeholder:text-black/70 outline-none"
+                  placeholder="Products weight"
+                />
+                <input
+                  className="border px-2 py-1.5 rounded-lg placeholder:text-black/70 outline-none"
+                  type="date"
+                  placeholder="Products weight"
+                />
+                <div className="flex items-center justify-between">
+                  <span className="text-black">Reminder</span>
+                  <select className="border px-2 py-1.5 rounded-lg text-black/70 outline-none">
+                    <option>Before 1 hour</option>
+                    <option>Before 2 hours</option>
+                    <option>Before 3 hours</option>
+                  </select>
+                </div>
+                <div className="flex gap-2 items-center mx-auto mt-3">
+                  <button
+                    onClick={() => setAddMenu(false)}
+                    className="px-6 py-2  rounded-full text-sm transition-all duration-300 text-[#A7A7A7] bg-[#FCFBFB]"
+                  >
+                    Cancel
+                  </button>
+                  <button className="px-6 py-2  rounded-full text-sm transition-all duration-300 text-white bg-[#287BCB] ">
+                    Save
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
           <div className="flex items-center mt-3">
             {["Confirmed", "Pending"].map((value, index) => {
