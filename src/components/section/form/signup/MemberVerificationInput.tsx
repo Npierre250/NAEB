@@ -8,7 +8,7 @@ const verificatioNesaSchema = z.object({
 });
 type ValidationSchema = z.infer<typeof verificatioNesaSchema>;
 
-export default function MemberVerificationInput() {
+export default function MemberVerificationInput({ updateFields, goTo }: any) {
   const {
     register,
     handleSubmit,
@@ -17,7 +17,11 @@ export default function MemberVerificationInput() {
     resolver: zodResolver(verificatioNesaSchema),
   });
   const onSubmit = (data: any) => {
-    console.log(data);
+    console.log(data, "===");
+    updateFields({
+      nesaCode: data.nesaCode,
+    });
+    goTo(2);
   };
   return (
     <form

@@ -7,9 +7,18 @@ import { useState } from "react";
 import MemberVerificationSelect from "../components/section/form/signup/MemberVerificationSelect";
 import MemberVerificationInput from "../components/section/form/signup/MemberVerificationInput";
 import CreateAccount from "../components/section/form/signup/CreateAccount";
-
+const INITIAL_DATA = {
+  isNaseMember: false,
+  nesaCode: null,
+};
 export default function Signup() {
+  const [data, setData] = useState(INITIAL_DATA);
   const [step, setStep] = useState(0);
+  function updateFields(fields: Partial<any>) {
+    setData((prev) => {
+      return { ...prev, ...fields };
+    });
+  }
   return (
     <div className="flex h-screen">
       <div className="relative bg-[#287BCB] hidden md:block md:max-w-lg w-full">
@@ -73,9 +82,19 @@ export default function Signup() {
           <span className="text-[#575757] font-light">
             {step === 2 ? "Fill in your credentials" : "Are you A NESA member"}
           </span>
-          {step === 0 && <MemberVerificationSelect goTo={setStep} />}
-          {step === 1 && <MemberVerificationInput />}
-          {step === 2 && <CreateAccount />}
+          {step === 0 && (
+            <MemberVerificationSelect
+              updateFields={updateFields}
+              goTo={setStep}
+            />
+          )}
+          {step === 1 && (
+            <MemberVerificationInput
+              updateFields={updateFields}
+              goTo={setStep}
+            />
+          )}
+          {step === 2 && <CreateAccount {...data} />}
         </div>
         <p className="sm:absolute bottom-3 mt-2 sm:mt-0">
           If you have account?{" "}

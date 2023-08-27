@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import classNames from "classnames";
 import { useState } from "react";
 
-export default function MemberVerificationSelect({ goTo }: any) {
+export default function MemberVerificationSelect({ updateFields, goTo }: any) {
   const [choose, setChoose] = useState("member");
+
   return (
     <div className="mt-8 flex flex-col gap-6">
       <div className="grid grid-cols-2 gap-3">
@@ -34,6 +34,7 @@ export default function MemberVerificationSelect({ goTo }: any) {
       </div>
       <button
         onClick={() => {
+          updateFields({ isNaseMember: choose === "member" ? true : false });
           if (choose === "member") {
             goTo(1);
           } else {

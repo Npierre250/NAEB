@@ -7,6 +7,8 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Logo from "../components/ui/Logo";
+import { useState } from "react";
+import { useAuth } from "../context/userManager";
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(50),
@@ -14,15 +16,36 @@ const loginSchema = z.object({
 type ValidationSchema = z.infer<typeof loginSchema>;
 
 export default function Login() {
+  const [isLoading, setIsLoading] = useState(false);
+  const { login }: any = useAuth();
+
   const {
     register,
+    setError,
     handleSubmit,
     formState: { errors },
   } = useForm<ValidationSchema>({
     resolver: zodResolver(loginSchema),
   });
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = async (data: any) => {
+    try {
+      setIsLoading(true);
+      await login({
+        email: data.email,
+        password: data.password,
+      });
+    } catch (error: any) {
+      setError("password", {
+        type: "custom",
+        message: error.message,
+      });
+      setError("email", {
+        type: "custom",
+        message: undefined,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   return (
     <div className="flex h-screen">
@@ -111,7 +134,12 @@ export default function Login() {
 
               <button
                 type="submit"
-                className="py-3 bg-[#287BCB] px-9 rounded-2xl text-white w-full mt-3"
+                className={classNames({
+                  "py-3 bg-[#287BCB] px-9 rounded-2xl text-white w-full mt-3":
+                    true,
+                  "opacity-100 ": !isLoading,
+                  "opacity-20 cursor-wait": isLoading,
+                })}
               >
                 Log in
               </button>

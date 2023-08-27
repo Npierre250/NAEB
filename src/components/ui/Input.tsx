@@ -1,6 +1,5 @@
 import classNames from "classnames";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export default function Input({
   label,
   defaultValue,
@@ -28,7 +27,7 @@ export default function Input({
           })}
         />
       </div>
-      {errors[name] && (
+      {errors[name]?.message && (
         <span className="text-red-500 text-sm">*{errors[name].message}</span>
       )}
     </div>
