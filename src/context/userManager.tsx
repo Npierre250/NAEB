@@ -29,7 +29,7 @@ const AuthProvider = ({ children }: any) => {
     if (error) {
       throw error;
     }
-    setUser(result);
+    setUser(result.user);
   };
   const login = async ({ email, password }: any) => {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -39,7 +39,7 @@ const AuthProvider = ({ children }: any) => {
     if (error) {
       throw error;
     }
-    setUser(data);
+    setUser(data.user);
   };
   async function getUser() {
     const { data } = await supabase.auth.getUser();

@@ -2,7 +2,7 @@ import classNames from "classnames";
 import FormStep from "../components/vectors/FormStep";
 import CircleSvg from "../components/vectors/Circle";
 import Input from "../components/ui/Input";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,6 +18,7 @@ type ValidationSchema = z.infer<typeof loginSchema>;
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const { login }: any = useAuth();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -34,6 +35,7 @@ export default function Login() {
         email: data.email,
         password: data.password,
       });
+      navigate("/dashboard");
     } catch (error: any) {
       setError("password", {
         type: "custom",
