@@ -17,6 +17,21 @@ export default function ProductCard({ data, setDelivery }: any) {
   };
   useOnClickOutside(ref, handleClickOutside);
 
+  async function deleteFunc() {
+    alert("Are you sure you want to delete this delivery ??");
+    try {
+      setLoading(true);
+      await supabase.from("delivery").delete().eq("id", data.id).select();
+      setDelivery((prev: any) => {
+        return prev.filter((value: any) => value.id !== data.id);
+      });
+    } catch (error) {
+      alert("Error deleting delivery");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function updateDelivery() {
     if (
       product_name === "" ||
@@ -149,7 +164,10 @@ export default function ProductCard({ data, setDelivery }: any) {
                 </div>
               </div>
             )}
-            <button className="px-4 py-2 rounded-full bg-[#ffeded] text-sm text-[#de3400bc]">
+            <button
+              onClick={deleteFunc}
+              className="px-4 py-2 rounded-full bg-[#ffeded] text-sm text-[#de3400bc]"
+            >
               Delete
             </button>
           </div>

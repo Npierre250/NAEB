@@ -34,7 +34,7 @@ export default function DashboardUserHome() {
         return backup.filter((value: any) => value.status === "pending");
       }
       if (whichOne === 2) {
-        return backup.filter((value: any) => value.status === "delivered");
+        return backup.filter((value: any) => value.status === "approve");
       }
       return backup;
     });
@@ -60,14 +60,14 @@ export default function DashboardUserHome() {
           {
             product_name,
             quantity,
-            delivery_date: `${dates.getDate()}/${dates.getDay()}/${dates.getFullYear()}`,
+            delivery_date: `${
+              dates.getMonth() + 1
+            }/${dates.getDate()}/${dates.getFullYear()}`,
             user_name: user.email.split("@")[0],
           },
         ])
         .select();
       delivery.push(...resp);
-      //   backup.push(...resp);
-      console.log(`delivery`, ...resp);
     } catch (error) {
       alert("Error updating delivery");
       console.log(error);
@@ -99,16 +99,17 @@ export default function DashboardUserHome() {
                   {backup
                     .filter((value: any) => value.status === "pending")
                     .reduce(
-                      (a: { quantity: any }, b: { quantity: any }) =>
-                        a + b.quantity,
+                      (a: number, b: { quantity: number }) => a + b.quantity,
                       0
                     )}{" "}
                   kg{" "}
                   <span className="text-[9px] text-[#00A0DE] py-[1px] px-[4px] rounded-full bg-[#CDE8FD]">
-                    {(backup.filter((value: any) => value.status === "pending")
-                      .length *
-                      100) /
-                      backup.length}{" "}
+                    {(
+                      (backup.filter((value: any) => value.status === "pending")
+                        .length *
+                        100) /
+                      backup.length
+                    ).toFixed(0)}{" "}
                     %
                   </span>
                 </span>
@@ -122,7 +123,7 @@ export default function DashboardUserHome() {
                 </span>
                 <span className="font-semibold text-sm capitalize inline-flex items-center gap-2">
                   {backup
-                    .filter((value: any) => value.status === "delivered")
+                    .filter((value: any) => value.status === "approve")
                     .reduce(
                       (a: { quantity: any }, b: { quantity: any }) =>
                         a + b.quantity,
@@ -130,11 +131,12 @@ export default function DashboardUserHome() {
                     )}{" "}
                   kg{" "}
                   <span className="text-[9px] text-[#00A0DE] py-[1px] px-[4px] rounded-full bg-[#CDE8FD]">
-                    {(backup.filter(
-                      (value: any) => value.status === "delivered"
-                    ).length *
-                      100) /
-                      backup.length}{" "}
+                    {(
+                      (backup.filter((value: any) => value.status === "approve")
+                        .length *
+                        100) /
+                      backup.length
+                    ).toFixed(0)}{" "}
                     %
                   </span>
                 </span>

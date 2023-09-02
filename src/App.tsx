@@ -14,6 +14,8 @@ import DashboardHome from "./page/dashboard/DashboardHome";
 import Schedule from "./page/dashboard/Schedule";
 import DashboardUserHome from "./page/dashboard/DashboardUserHome";
 import { useAuth } from "./context/userManager";
+import Profile from "./page/dashboard/Profile";
+import Calling from "./page/dashboard/Calling";
 
 function App() {
   const { user }: any = useAuth();
@@ -28,7 +30,7 @@ function App() {
           <Route
             index
             element={
-              user?.email === "hirwaaldo2@gmail.com" ? (
+              user?.email !== "admin@gmail.com" ? (
                 <DashboardUserHome />
               ) : (
                 <DashboardHome />
@@ -36,6 +38,8 @@ function App() {
             }
           />
           <Route path="schedule" element={<Schedule />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="calling" element={<Calling />} />
           {/* <Route path="deliveries" element={<DashboardUserHome />} /> */}
           <Route path="*" element={<NotFound />} />
         </Route>

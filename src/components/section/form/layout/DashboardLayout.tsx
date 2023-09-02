@@ -1,11 +1,12 @@
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import Avatar from "../../../ui/Avatar";
 import ArrowCircle from "../../../vectors/ArrowCircle";
-import Notificatioin from "../../../vectors/Notificatioin";
 import Home, { Calling, Profile } from "../../../vectors/Home";
 import classNames from "classnames";
 import { useAuth } from "../../../../context/userManager";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useOnClickOutside } from "usehooks-ts";
+import { supabase } from "../../../../supabase/client";
 
 const MENUP_ONE = [
   {
@@ -44,6 +45,12 @@ const MENUP_TWO = [
 
 export default function DashboardLayout() {
   const { user }: any = useAuth();
+  const [addMenu, setAddMenu] = useState(false);
+  const ref = useRef(null);
+  const handleClickOutside = () => {
+    setAddMenu(false);
+  };
+  useOnClickOutside(ref, handleClickOutside);
   const navigate = useNavigate();
   const daysOfWeek = [
     "Sunday",
@@ -54,6 +61,13 @@ export default function DashboardLayout() {
     "Friday",
     "Saturday",
   ];
+
+  async function logoutFunc() {
+    alert("Are sure you want logout ??");
+    await supabase.auth.signOut();
+    window.location.reload();
+  }
+
   useEffect(() => {
     if (user === null) navigate("/");
   }, [user]);
@@ -79,18 +93,33 @@ export default function DashboardLayout() {
                     Hi, {user.email.split("@")[0]}
                   </span>
                   <span className="text-[#615E69] text-sm capitalize">
-                    Today is {daysOfWeek[new Date().getDay() - 1] || "Sunday"}{" "}
+                    Today is {daysOfWeek[new Date().getDay()] || "Sunday"}{" "}
                     {new Date().getDate()} September 2023
                   </span>
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-12">
-              <Notificatioin className="w-6 h-6" />
-              <div className="flex items-center gap-4">
+            <div className="flex items-center gap-12 relative">
+              <div
+                className="flex items-center gap-4 cursor-pointer"
+                onClick={() => setAddMenu(true)}
+              >
                 <Avatar title={user.email.split("@")[0]} subTitle="Kicukiro" />
                 <ArrowCircle />
               </div>
+              {addMenu && (
+                <div
+                  ref={ref}
+                  className="absolute z-[100] flex flex-col items-start gap-2 w-full p-2 px-4 -bottom-[75px] rounded-md bg-white shadow-2xl"
+                >
+                  <button className="w-full text-left">
+                    <Link to={"profile"}>Profile</Link>
+                  </button>
+                  <button onClick={logoutFunc} className="w-full text-left">
+                    Logout
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -7,30 +7,42 @@ import CircleSvg, { CircleSvgRight } from "../components/vectors/Circle";
 import BgHero from "../components/vectors/BgHero";
 import { Link, NavLink } from "react-router-dom";
 import Logo from "../components/ui/Logo";
+import { useAuth } from "../context/userManager";
 
 function Home() {
   const [active, setActive] = useState(1);
+  const { user }: any = useAuth();
   const menu = [
     {
       id: 1,
       name: "Packouse",
       link: "/application",
+      show: true,
     },
     {
       id: 2,
       name: "How it works",
       link: "#work",
       hash: true,
+      show: true,
     },
     {
       id: 3,
       name: "Log in",
       link: "/login",
+      show: !user,
     },
     {
       id: 4,
       name: "Sign up",
       link: "/signup",
+      show: !user,
+    },
+    {
+      id: 5,
+      name: "Dashboard",
+      link: "/dashboard",
+      show: !!user,
     },
   ];
   const footerMenu = [
@@ -80,6 +92,7 @@ function Home() {
                   </a>
                 );
               }
+              if (val.show === false) return null;
               return (
                 <NavLink
                   to={val.link}
