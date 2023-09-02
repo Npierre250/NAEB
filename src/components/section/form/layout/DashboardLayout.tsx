@@ -2,9 +2,8 @@ import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import Avatar from "../../../ui/Avatar";
 import ArrowCircle from "../../../vectors/ArrowCircle";
 import Notificatioin from "../../../vectors/Notificatioin";
-import Home, { Calling, Delival, Profile } from "../../../vectors/Home";
+import Home, { Calling, Profile } from "../../../vectors/Home";
 import classNames from "classnames";
-import Schedule from "../../../vectors/Schedule";
 import { useAuth } from "../../../../context/userManager";
 import { useEffect } from "react";
 
@@ -15,18 +14,18 @@ const MENUP_ONE = [
     path: "/dashboard",
     counter: 1,
   },
-  {
-    title: "Deliveries",
-    icon: <Delival />,
-    path: "/dashboard/deliveries",
-    counter: 0,
-  },
-  {
-    title: "Schedule",
-    icon: <Schedule />,
-    path: "/dashboard/schedule",
-    counter: 3,
-  },
+  // {
+  //   title: "Deliveries",
+  //   icon: <Delival />,
+  //   path: "/dashboard/deliveries",
+  //   counter: 0,
+  // },
+  // {
+  //   title: "Schedule",
+  //   icon: <Schedule />,
+  //   path: "/dashboard/schedule",
+  //   counter: 3,
+  // },
 ];
 const MENUP_TWO = [
   {
@@ -46,7 +45,15 @@ const MENUP_TWO = [
 export default function DashboardLayout() {
   const { user }: any = useAuth();
   const navigate = useNavigate();
-  console.log(user, "----");
+  const daysOfWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
   useEffect(() => {
     if (user === null) navigate("/");
   }, [user]);
@@ -67,8 +74,15 @@ export default function DashboardLayout() {
                 <img src="/logo-2.png" alt="logo" width={163} height={42} />
               </Link>
               <div className="flex items-center gap-4">
-                <span className="text-[#707070] font-semibold">Schedule</span>
-                <button className="text-[#63BCFF] font-semibold">4 new</button>
+                <div className="flex flex-col">
+                  <span className="font-semibold text-base capitalize">
+                    Hi, {user.email.split("@")[0]}
+                  </span>
+                  <span className="text-[#615E69] text-sm capitalize">
+                    Today is {daysOfWeek[new Date().getDay() - 1] || "Sunday"}{" "}
+                    {new Date().getDate()} September 2023
+                  </span>
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-12">
@@ -117,7 +131,7 @@ export default function DashboardLayout() {
                 );
               })}
             </div>
-            <div className="flex flex-col items-center gap-1 mt-20">
+            <div className="flex flex-col items-center gap-1 mt-10">
               {MENUP_TWO.map((item, index) => {
                 return (
                   <NavLink to={item.path} style={{ width: "100%" }} key={index}>

@@ -1,163 +1,110 @@
-import { useRef, useState } from "react";
-import CalendarButton from "../../components/ui/CalendarButton";
-import Plus from "../../components/vectors/Plus";
-import classNames from "classnames";
-import Close from "../../components/vectors/Close";
-import { useOnClickOutside } from "usehooks-ts";
+import { useEffect, useState } from "react";
+import ChartView from "../../components/ui/Chart";
+import ScheduleRequestCard from "../../components/ui/ScheduleRequestCard";
+import Chevn from "../../components/vectors/Chevn";
+import { supabase } from "../../supabase/client";
 
 export default function DashboardHome() {
-  const [upcoming, setUpcoming] = useState("Confirmed");
-  const [addMenu, setAddMenu] = useState(false);
-  const ref = useRef(null);
+  const [delivery, setDelivery] = useState<any>([]);
+  useEffect(() => {
+    const fetch = async () => {
+      let { data, error } = await supabase.from("delivery").select("*");
+      if (error) {
+        console.log(error);
+      }
+      setDelivery(data);
+    };
+    fetch();
+  }, []);
 
-  const handleClickOutside = () => {
-    setAddMenu(false);
-  };
-  useOnClickOutside(ref, handleClickOutside);
   return (
-    <div className="flex gap-5 p-5">
-      <div className="flex-1 flex flex-col gap-5">
-        <div className="w-full bg-white rounded-lg px-6 py-6 flex gap-8">
-          <h3 className="text-xl font-semibold text-[#707070]">
-            September 2023
-          </h3>
-          <p className="font-light">8:30 AM</p>
-          <span className="text-[#63BCFF] font-semibold">2 Upcoming</span>
+    <div className="flex gap-5 p-5 h-full">
+      <div className="flex-1 h-full flex flex-col gap-4">
+        <div className="w-full bg-white rounded-lg px-6 py-3 flex flex-col gap-4">
+          <div className="flex justify-between items-center">
+            <h4 className="font-semibold text-[17px]">Stock</h4>
+            <p className="text-[#42ADE2]">View list</p>
+          </div>
+          <div className="flex gap-14">
+            <div className="flex flex-col">
+              <span className="text-[#737373] font-light text-[15px]">
+                Received
+              </span>
+              <h4 className="font-semibold">120 kg</h4>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[#737373] font-light text-[15px]">
+                In stock
+              </span>
+              <h4 className="font-semibold">120 kg</h4>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[#737373] font-light text-[15px]">
+                Received
+              </span>
+              <h4 className="font-semibold">120 kg</h4>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[#737373] font-light text-[15px]">
+                Received
+              </span>
+              <h4 className="font-semibold">120 kg</h4>
+            </div>
+          </div>
         </div>
-        <div className="w-full bg-white rounded-lg">
-          <div className="grid grid-cols-7 grid-rows-6 w-full">
-            {[
-              "Monday",
-              "Tuesday",
-              "Wednesday",
-              "Thursday",
-              "Friday",
-              "Saturday",
-              "Sunday",
-            ].map((value, index) => {
+        <div className="w-full bg-white rounded-lg px-8 py-6 flex flex-col gap-4 overflow-auto">
+          <div className="flex justify-between items-center">
+            <h4 className="font-semibold text-[17px]">Production reports</h4>
+            <button className="text-[#42ADE2] px-6 py-2 bg-[#F0F0F5] rounded-full flex justify-between items-center gap-3">
+              <span>Monthly</span>
+              <Chevn />
+            </button>
+          </div>
+          <div className="w-full">
+            <ChartView />
+          </div>
+        </div>
+        <div className="w-full bg-white rounded-lg px-8 py-6 flex flex-col gap-4 overflow-auto">
+          <div className="flex justify-between items-center">
+            <h4 className="font-semibold text-[17px]">Popular products</h4>
+          </div>
+          <div className="grid-cols-3 grid gap-10 items-center">
+            {["Received", "Beans", "Sugar"].map((v, k) => {
               return (
-                <div
-                  className="px-5 h-[80px] flex items-center text-[#707070] text-lg font-normal"
-                  key={index}
-                >
-                  {value}
+                <div className="flex items-start flex-col gap-2 w-full" key={k}>
+                  <span className="text-[17px] font-light">{v}</span>
+                  <div className="flex items-center w-full bg-[#F5F5F5] rounded-r-full">
+                    <span
+                      className="bg-[#93CFFC] rounded-full h-2.5"
+                      style={{ width: "40%" }}
+                    />
+                    <span className="w-full bg-[#F5F5F5] rounded-r-full h-2.5" />
+                  </div>
                 </div>
               );
             })}
-            {Array(35)
-              .fill(22)
-              .map((value, index) => {
-                return <CalendarButton key={index} date={value} />;
-              })}
           </div>
         </div>
       </div>
-      <div className="min-w-[322px]">
-        <div className="w-full bg-white h-full rounded-lg px-6 py-5">
-          <div className="flex items-center justify-between relative">
-            <span>Upcoming deliveries</span>
-            <button onClick={() => setAddMenu(true)}>
-              <Plus />
+      <div className="min-w-[482px] h-full">
+        <div className="w-full h-full rounded-lg px-6 py-3 flex flex-col gap-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-xl font-semibold">Schedule requests</h3>
+            <button className="text-[#42ADE2] px-6 py-2 bg-[#F0F0F5] rounded-full">
+              View list
             </button>
-            {addMenu && (
-              <div
-                ref={ref}
-                className="absolute top-10 z-50 -left-4 w-[300px] flex flex-col gap-2 bg-white rounded-2xl shadow-2xl px-4 py-4 overflow-auto"
-              >
-                <div className="flex justify-between mb-3">
-                  <span>Add deliveries</span>
-                  <button onClick={() => setAddMenu(false)}>
-                    <Close />
-                  </button>
-                </div>
-                <input
-                  className="border px-2 py-1.5 rounded-lg placeholder:text-black/70 outline-none"
-                  placeholder="Add product title"
-                />
-                <input
-                  className="border px-2 py-1.5 rounded-lg placeholder:text-black/70 outline-none"
-                  placeholder="Products weight"
-                />
-                <input
-                  className="border px-2 py-1.5 rounded-lg placeholder:text-black/70 outline-none"
-                  type="date"
-                  placeholder="Products weight"
-                />
-                <div className="flex items-center justify-between">
-                  <span className="text-black">Reminder</span>
-                  <select className="border px-2 py-1.5 rounded-lg text-black/70 outline-none">
-                    <option>Before 1 hour</option>
-                    <option>Before 2 hours</option>
-                    <option>Before 3 hours</option>
-                  </select>
-                </div>
-                <div className="flex gap-2 items-center mx-auto mt-3">
-                  <button
-                    onClick={() => setAddMenu(false)}
-                    className="px-6 py-2  rounded-full text-sm transition-all duration-300 text-[#A7A7A7] bg-[#FCFBFB]"
-                  >
-                    Cancel
-                  </button>
-                  <button className="px-6 py-2  rounded-full text-sm transition-all duration-300 text-white bg-[#287BCB] ">
-                    Save
-                  </button>
-                </div>
+          </div>
+          <div className="flex flex-col gap-3 overflow-auto h-full pb-32">
+            {delivery.length === 0 ? (
+              <div className="flex items-center flex-col">
+                <p>It is Empty</p>
               </div>
+            ) : (
+              delivery.map((value: any, index: any) => {
+                return <ScheduleRequestCard key={index} data={value} />;
+              })
             )}
           </div>
-          <div className="flex items-center mt-3">
-            {["Confirmed", "Pending"].map((value, index) => {
-              return (
-                <button
-                  key={index}
-                  onClick={() => setUpcoming(value)}
-                  className={classNames({
-                    "p-4 relative transition-all duration-300": true,
-                    "text-[#42ADE2]": upcoming === value,
-                    "text-[#8E8C94]": upcoming !== value,
-                  })}
-                >
-                  {value}
-
-                  <span
-                    className={classNames({
-                      "absolute bottom-0 left-0 transition-all duration-300":
-                        true,
-                      "bg-[#42ADE2] h-0.5 w-full": upcoming === value,
-                      "bg-transparent h-0 w-0": upcoming !== value,
-                    })}
-                  />
-                </button>
-              );
-            })}
-          </div>
-          {upcoming === "Confirmed" ? (
-            <div className="flex gap-5 flex-col mt-10">
-              {Array(3)
-                .fill(0)
-                .map((_, index) => {
-                  return (
-                    <div key={index} className="flex items-center gap-3">
-                      <div className="flex flex-col gap-0 bg-[#E9FDF8] rounded-lg px-4 py-2 items-center">
-                        <span className="font-semibold">12</span>
-                        <span className="text-[#A5A3A9]">July</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-semibold">Beans & coffee</span>
-                        <span className="text-[#707070] font-semibold">
-                          40 kg
-                        </span>
-                        <span className="text-sm text-[#707070] font-light">
-                          8:00 PM
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-            </div>
-          ) : (
-            <p className="mt-10 text-center">Pending !!!</p>
-          )}
         </div>
       </div>
     </div>
