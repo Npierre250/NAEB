@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import ProductCard from "../../components/ui/ProductCard";
 import { supabase } from "../../supabase/client";
 import { useAuth } from "../../context/userManager";
+import Loader from "../../components/Loader";
+import { toast } from "react-hot-toast";
 
 export default function DashboardUserHome() {
   const [loading, setLoading] = useState(false);
@@ -13,17 +15,28 @@ export default function DashboardUserHome() {
   const [quantity, setQuantity] = useState<any>("");
   const [delivery_date, setDelivery_date] = useState<any>("");
   const { user }: any = useAuth();
+
+  const [loadingDeliveries, setloadingDeliveries] = useState(false);
   useEffect(() => {
-    const fetch = async () => {
-      let { data, error } = await supabase.from("delivery").select("*");
-      if (error) {
-        console.log(error);
-      }
-      setDelivery(data);
-      setBackup(data);
-    };
-    fetch();
-  }, []);
+    setloadingDeliveries(true);
+    if (user) {
+      const fetch = async () => {
+        let { data, error } = await supabase
+          .from("delivery")
+          .select("*")
+          .eq("user_name", user.email.split("@")[0]);
+        if (error) {
+          console.log(error);
+        }
+        setDelivery(data);
+        setBackup(data);
+        setloadingDeliveries(false);
+      };
+      fetch();
+    }
+  }, [user]);
+
+  console.log(delivery);
 
   useEffect(() => {
     setDelivery(() => {
@@ -34,7 +47,10 @@ export default function DashboardUserHome() {
         return backup.filter((value: any) => value.status === "pending");
       }
       if (whichOne === 2) {
-        return backup.filter((value: any) => value.status === "approve");
+        return backup.filter((value: any) => value.status === "approved");
+      }
+      if (whichOne === 3) {
+        return backup.filter((value: any) => value.status === "declined");
       }
       return backup;
     });
@@ -68,8 +84,13 @@ export default function DashboardUserHome() {
         ])
         .select();
       delivery.push(...resp);
-    } catch (error) {
-      alert("Error updating delivery");
+      // clear all form inputs
+      setProduct_name("");
+      setQuantity("");
+      setDelivery_date("");
+      toast.success("Delivery added successfully");
+    } catch (error: any) {
+      toast.error(error.message);
       console.log(error);
     } finally {
       setLoading(false);
@@ -77,15 +98,18 @@ export default function DashboardUserHome() {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-5">
+    <div className="p-5">
       <div className="flex gap-4">
         <div className="w-[400px] bg-white rounded-lg px-8 py-6 flex gap-5 flex-col">
           <span>Total deliveries</span>
           <span className="font-semibold text-[30px]">
-            {backup.reduce(
-              (a: { quantity: any }, b: { quantity: any }) => a + b.quantity,
-              0
-            )}{" "}
+            {backup
+              ? backup.reduce(
+                  (a: { quantity: any }, b: { quantity: any }) =>
+                    a + b.quantity,
+                  0
+                )
+              : "---"}
             kg
           </span>
           <div className="flex gap-4">
@@ -101,15 +125,15 @@ export default function DashboardUserHome() {
                     .reduce(
                       (a: number, b: { quantity: number }) => a + b.quantity,
                       0
-                    )}{" "}
-                  kg{" "}
+                    )}
+                  kg
                   <span className="text-[9px] text-[#00A0DE] py-[1px] px-[4px] rounded-full bg-[#CDE8FD]">
                     {(
                       (backup.filter((value: any) => value.status === "pending")
                         .length *
                         100) /
                       backup.length
-                    ).toFixed(0)}{" "}
+                    ).toFixed(0)}
                     %
                   </span>
                 </span>
@@ -119,24 +143,25 @@ export default function DashboardUserHome() {
               <span className="w-0.5 h-full bg-[#00A0DE]" />
               <div className="flex flex-col">
                 <span className="text-[#615E69] text-sm capitalize">
-                  Delivered
+                  Approved
                 </span>
                 <span className="font-semibold text-sm capitalize inline-flex items-center gap-2">
                   {backup
-                    .filter((value: any) => value.status === "approve")
+                    .filter((value: any) => value.status === "approved")
                     .reduce(
                       (a: { quantity: any }, b: { quantity: any }) =>
                         a + b.quantity,
                       0
-                    )}{" "}
-                  kg{" "}
+                    )}
+                  kg
                   <span className="text-[9px] text-[#00A0DE] py-[1px] px-[4px] rounded-full bg-[#CDE8FD]">
                     {(
-                      (backup.filter((value: any) => value.status === "approve")
-                        .length *
+                      (backup.filter(
+                        (value: any) => value.status === "approved"
+                      ).length *
                         100) /
                       backup.length
-                    ).toFixed(0)}{" "}
+                    ).toFixed(0)}
                     %
                   </span>
                 </span>
@@ -152,6 +177,7 @@ export default function DashboardUserHome() {
               <input
                 placeholder="Product name"
                 required
+                value={product_name}
                 onChange={(e) => setProduct_name(e.target.value)}
                 className="w-full py-3 px-3 outline-none border-none bg-[#F0F8FF] placeholder:text-[#CACACA] font-light"
               />
@@ -161,6 +187,8 @@ export default function DashboardUserHome() {
               <input
                 placeholder="Quantity"
                 required
+                type="number"
+                value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 className="w-full py-3 px-3 outline-none border-none bg-[#F0F8FF] placeholder:text-[#CACACA] font-light"
               />
@@ -171,6 +199,7 @@ export default function DashboardUserHome() {
                 placeholder="Delivery Date"
                 required
                 type="date"
+                value={delivery_date}
                 onChange={(e) => setDelivery_date(e.target.value)}
                 className="w-full py-3 px-3 outline-none border-none bg-[#F0F8FF] placeholder:text-[#CACACA] font-light"
               />
@@ -189,9 +218,9 @@ export default function DashboardUserHome() {
           </button>
         </div>
       </div>
-      <div className="bg-white rounded-lg px-8 py-6 flex gap-5 flex-col w-full overflow-auto">
+      <div className="rounded-lg  bg-white mt-4 px-8 py-6 w-full">
         {delivery && (
-          <div className="flex items-center border border-[#287BCB] w-fit m-0 p-0">
+          <div className="flex items-center mb-4 border border-[#287BCB] w-fit m-0 p-0">
             <button
               onClick={() => setWhichOne(0)}
               className={classNames({
@@ -221,28 +250,46 @@ export default function DashboardUserHome() {
                 "bg-[#287BCB] text-white": whichOne === 2,
               })}
             >
-              Delivered
+              Approved
+            </button>
+            <button
+              onClick={() => setWhichOne(3)}
+              className={classNames({
+                "px-10 py-3 text-sm border-l border-[#287BCB] transition-all duration-300  w-fit text-[#287BCB]":
+                  true,
+                "bg-[#287BCB] text-white": whichOne === 3,
+              })}
+            >
+              Declined
             </button>
           </div>
         )}
 
-        <div className="grid grid-cols-3 gap-10 overflow-auto h-[40vh]">
-          {delivery.length === 0 ? (
-            <div className="flex flex-col">
-              <p>It is Empty</p>
-            </div>
-          ) : (
-            delivery.map((value: any, index: any) => {
+        {loadingDeliveries && (
+          <div className="flex w-full justify-center h-[300px]  items-center flex-col">
+            <Loader />
+          </div>
+        )}
+        {delivery?.length === 0 && !loadingDeliveries && (
+          <div className="flex w-full justify-center h-[300px]  items-center flex-col">
+            <p>You have no deliveries.</p>
+          </div>
+        )}
+        {delivery.length && !loading && (
+          <div className="grid grid-cols-3 gap-5">
+            {delivery.map((value: any, index: any) => {
               return (
-                <ProductCard
-                  setDelivery={setDelivery}
-                  key={index}
-                  data={value}
-                />
+                <>
+                  <ProductCard
+                    setDelivery={setDelivery}
+                    key={index}
+                    data={value}
+                  />
+                </>
               );
-            })
-          )}
-        </div>
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

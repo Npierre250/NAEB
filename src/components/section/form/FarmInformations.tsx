@@ -102,8 +102,7 @@ export default function FarmInformations({
       </div>
       <Input
         label="Desired products"
-        placeholder="Enter your phone number"
-        type="number"
+        placeholder="Enter products"
         name="desiredProducts"
         defaultValue={desiredProducts}
         register={register}

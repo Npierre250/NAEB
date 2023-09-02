@@ -7,7 +7,7 @@ export default function Done() {
       <span className="text-[#287BCB] font-light">Packhouse</span>
       <h3 className="text-4xl font-bold text-[#287BCB] mb-1">Application</h3>
       <p>
-        Thankyou for apply for Naeb packhouse service please wait for an email
+        Thank you for apply for Naeb packhouse service please wait for an email
         or message ony you contacts
       </p>
       <button

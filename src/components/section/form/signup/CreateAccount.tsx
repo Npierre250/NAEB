@@ -50,12 +50,10 @@ export default function CreateAccount({ isNaseMember, nesaCode }: any) {
       });
       navigate("/dashboard");
     } catch (error: any) {
-      if (error.status === 429) {
-        setError("email", {
-          type: "custom",
-          message: "Email is taken please change it!!",
-        });
-      }
+      setError("email", {
+        type: "custom",
+        message: error.message,
+      });
     } finally {
       setIsLoading(false);
     }

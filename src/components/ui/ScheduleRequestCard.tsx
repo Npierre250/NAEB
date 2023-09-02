@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import { useState } from "react";
 import { supabase } from "../../supabase/client";
+import { toast } from "react-hot-toast";
 
 export default function ScheduleRequestCard({ data }: any) {
   const [status, setStatus] = useState(data.status);
@@ -17,14 +18,14 @@ export default function ScheduleRequestCard({ data }: any) {
             </div>
             <div className="flex flex-col gap-0">
               <h4 className="font-semibold">{data.user_name}</h4>
-              <span className="text-sm text-[#737373]">kanombe,kicukiro</span>
+              <span className="text-sm text-[#737373]">kicukiro</span>
             </div>
           </div>
           {status === "pending" ? (
             <div className="flex gap-2 items-center">
               <button
                 className={classNames({
-                  "px-6 py-2  rounded-full text-sm transition-all duration-300 bg-slate-200 text-white hover:bg-[#287BCB]":
+                  "px-6 py-2  rounded-full text-sm transition-all duration-300 bg-red-100 text-red-500 hover:bg-red-200":
                     true,
                   "cursor-wait opacity-60": loading,
                 })}
@@ -33,10 +34,11 @@ export default function ScheduleRequestCard({ data }: any) {
                   try {
                     await supabase
                       .from("delivery")
-                      .update({ status: "decline" })
+                      .update({ status: "declined" })
                       .eq("id", data.id)
                       .select();
-                    setStatus("decline");
+                    setStatus("declined");
+                    toast.success("Request declined");
                   } catch (error) {
                     console.log(error);
                   } finally {
@@ -49,7 +51,7 @@ export default function ScheduleRequestCard({ data }: any) {
               </button>
               <button
                 className={classNames({
-                  "px-6 py-2  rounded-full text-sm transition-all duration-300 bg-slate-200 text-white hover:bg-[#287BCB]":
+                  "px-6 py-2  rounded-full text-sm transition-all duration-300 bg-[#287BCB] text-white hover:bg-[#287BCB]":
                     true,
                   "cursor-wait opacity-60": loading,
                 })}
@@ -58,10 +60,11 @@ export default function ScheduleRequestCard({ data }: any) {
                   try {
                     await supabase
                       .from("delivery")
-                      .update({ status: "approve" })
+                      .update({ status: "approved" })
                       .eq("id", data.id)
                       .select();
-                    setStatus("approve");
+                    setStatus("approved");
+                    toast.success("Delivery approved");
                   } catch (error) {
                     console.log(error);
                   } finally {

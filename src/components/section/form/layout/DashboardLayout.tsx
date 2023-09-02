@@ -44,7 +44,7 @@ const MENUP_TWO = [
 ];
 
 export default function DashboardLayout() {
-  const { user }: any = useAuth();
+  const { user, setUser }: any = useAuth();
   const [addMenu, setAddMenu] = useState(false);
   const ref = useRef(null);
   const handleClickOutside = () => {
@@ -63,9 +63,11 @@ export default function DashboardLayout() {
   ];
 
   async function logoutFunc() {
-    alert("Are sure you want logout ??");
-    await supabase.auth.signOut();
-    window.location.reload();
+    if (confirm("Are sure you want logout ??")) {
+      // await supabase.auth.signOut();
+      navigate("/");
+      setUser(null);
+    }
   }
 
   useEffect(() => {
@@ -80,15 +82,15 @@ export default function DashboardLayout() {
   }
   if (user) {
     return (
-      <main className="bg-[#F6FAFF] w-full h-screen overflow-hidden">
-        <div className="bg-white">
+      <main className="bg-[#F6FAFF] w-full">
+        <div className="bg-white z-50 fixed w-full">
           <div className="max-w-screen-2xl mx-auto px-4 flex items-center justify-between py-4">
             <div className="flex items-center gap-32">
               <Link to={"/"}>
                 <img src="/logo-2.png" alt="logo" width={163} height={42} />
               </Link>
               <div className="flex items-center gap-4">
-                <div className="flex flex-col">
+                <div className="flex space-y-2 flex-col">
                   <span className="font-semibold text-base capitalize">
                     Hi, {user.email.split("@")[0]}
                   </span>
@@ -113,7 +115,14 @@ export default function DashboardLayout() {
                   className="absolute z-[100] flex flex-col items-start gap-2 w-full p-2 px-4 -bottom-[75px] rounded-md bg-white shadow-2xl"
                 >
                   <button className="w-full text-left">
-                    <Link to={"profile"}>Profile</Link>
+                    <Link
+                      onClick={() => {
+                        setAddMenu(false);
+                      }}
+                      to={"profile"}
+                    >
+                      Profile
+                    </Link>
                   </button>
                   <button onClick={logoutFunc} className="w-full text-left">
                     Logout
@@ -124,7 +133,7 @@ export default function DashboardLayout() {
           </div>
         </div>
         <div className="flex h-full">
-          <div className="bg-white w-[300px] pt-10">
+          <div className="bg-white pt-24 fixed w-[300px] h-full">
             <div className="flex flex-col items-center gap-1">
               {MENUP_ONE.map((item, index) => {
                 return (
@@ -191,7 +200,7 @@ export default function DashboardLayout() {
               })}
             </div>
           </div>
-          <div className="flex-1">
+          <div className="flex-1 pl-[300px] pt-24">
             <Outlet />
           </div>
         </div>

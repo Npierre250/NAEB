@@ -13,7 +13,7 @@ const INITIAL_DATA = {
 };
 export default function Signup() {
   const [data, setData] = useState(INITIAL_DATA);
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(2);
   function updateFields(fields: Partial<any>) {
     setData((prev) => {
       return { ...prev, ...fields };

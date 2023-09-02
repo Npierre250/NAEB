@@ -16,6 +16,7 @@ import DashboardUserHome from "./page/dashboard/DashboardUserHome";
 import { useAuth } from "./context/userManager";
 import Profile from "./page/dashboard/Profile";
 import Calling from "./page/dashboard/Calling";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const { user }: any = useAuth();
@@ -46,7 +47,12 @@ function App() {
       </>
     )
   );
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <Toaster />
+      <RouterProvider router={router} />
+    </>
+  );
 }
 
 export default App;

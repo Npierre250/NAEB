@@ -3,7 +3,7 @@ import { useOnClickOutside } from "usehooks-ts";
 import Close from "../vectors/Close";
 import { supabase } from "../../supabase/client";
 import classNames from "classnames";
-
+import { toast } from "react-hot-toast";
 export default function ProductCard({ data, setDelivery }: any) {
   const [loading, setLoading] = useState(false);
   const [addMenu, setAddMenu] = useState(false);
@@ -25,8 +25,9 @@ export default function ProductCard({ data, setDelivery }: any) {
       setDelivery((prev: any) => {
         return prev.filter((value: any) => value.id !== data.id);
       });
-    } catch (error) {
-      alert("Error deleting delivery");
+      toast.success("Delivery deleted successfully");
+    } catch (error: any) {
+      toast.success(error.message);
     } finally {
       setLoading(false);
     }
@@ -45,7 +46,6 @@ export default function ProductCard({ data, setDelivery }: any) {
     }
     try {
       setLoading(true);
-      // const dates = new Date(delivery_date);
       await supabase
         .from("delivery")
         .update({
@@ -79,7 +79,7 @@ export default function ProductCard({ data, setDelivery }: any) {
     <div className="border border-[#F3F3F3] rounded-md px-4 py-3 h-fit">
       <div className="flex justify-between items-center">
         <div className="flex flex-col">
-          <span className="text-[#615E69] text-sm capitalize">Products</span>
+          <span className="text-[#615E69] text-sm capitalize">Product</span>
           <span className="font-normal text-sm capitalize inline-flex items-center gap-2">
             {data.product_name}
           </span>
@@ -125,23 +125,23 @@ export default function ProductCard({ data, setDelivery }: any) {
                 </div>
                 <input
                   onChange={(e) => setProduct_name(e.target.value)}
-                  defaultValue={data.product_name}
+                  value={product_name}
                   className="border px-2 py-1.5 rounded-lg placeholder:text-black/70 outline-none"
-                  placeholder="Add product title"
+                  placeholder="Add product naame"
                 />
                 <input
                   onChange={(e) => setQuantity(e.target.value)}
-                  defaultValue={data.quantity}
+                  value={quantity}
+                  type="number"
                   className="border px-2 py-1.5 rounded-lg placeholder:text-black/70 outline-none"
-                  placeholder="Products weight"
+                  placeholder="Products quantity"
                 />
                 <input
                   onChange={(e) => setDelivery_date(e.target.value)}
-                  placeholder={data.delivery_date}
+                  placeholder={"Delivery date"}
                   value={delivery_date}
                   className="border px-2 py-1.5 rounded-lg placeholder:text-black/70 outline-none"
-                  // type="date"
-                  // placeholder="Products weight"
+                  type="date"
                 />
 
                 <div className="flex gap-2 items-center mx-auto mt-3">

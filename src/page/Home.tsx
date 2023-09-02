@@ -179,7 +179,7 @@ function Home() {
               height={296}
               className="w"
             />
-            <h4 className="text-xl font-bold">Online Packhouse registration</h4>
+            <h4 className="text-xl font-bold">Track your deliveries</h4>
             <p>
               Use your Naeb application CODE to have account online pachkhouse
             </p>
@@ -235,7 +235,7 @@ function Home() {
                           className={classNames({
                             "h-0": active !== item.id,
                             "h-[200px] md:h-[120px]": active === item.id,
-                            "transition-all duration-300 ease-in-out mt-3 overflow-hidden":
+                            "transition-all leading-8 duration-300 ease-in-out mt-3 overflow-hidden":
                               true,
                           })}
                         >
@@ -252,11 +252,11 @@ function Home() {
       </section>
       <footer className="bg-[#287BCB] pt-12 relative">
         <div className="max-w-6xl mx-auto px-3">
-          <div className="flex justify-between flex-wrap">
+          <div className="flex justify-between">
             <div>
-              <button>
+              <Link to="/">
                 <img src="/logo.png" alt="logo" width={218.25} height={53} />
-              </button>
+              </Link>
             </div>
             <div className="flex gap-2 w-fit md:justify-end flex-wrap">
               <div className="flex flex-col gap-2 md:w-1/2">
