@@ -6,7 +6,6 @@ import classNames from "classnames";
 import { useAuth } from "../../../../context/userManager";
 import { useEffect, useRef, useState } from "react";
 import { useOnClickOutside } from "usehooks-ts";
-import { supabase } from "../../../../supabase/client";
 
 const MENUP_ONE = [
   {

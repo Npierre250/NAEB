@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import ChartView from "../../components/ui/Chart";
 import ScheduleRequestCard from "../../components/ui/ScheduleRequestCard";
-import Chevn from "../../components/vectors/Chevn";
 import { supabase } from "../../supabase/client";
 import Loader from "../../components/Loader";
 
