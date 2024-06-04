@@ -17,6 +17,7 @@ import { useAuth } from "./context/userManager";
 import Profile from "./page/dashboard/Profile";
 import Calling from "./page/dashboard/Calling";
 import { Toaster } from "react-hot-toast";
+import Subscription from "./page/dashboard/Subscription";
 
 function App() {
   const { user }: any = useAuth();
@@ -41,6 +42,7 @@ function App() {
           <Route path="schedule" element={<Schedule />} />
           <Route path="profile" element={<Profile />} />
           <Route path="calling" element={<Calling />} />
+          <Route path="subscription" element={<Subscription />} />
           {/* <Route path="deliveries" element={<DashboardUserHome />} /> */}
           <Route path="*" element={<NotFound />} />
         </Route>

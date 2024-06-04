@@ -1,7 +1,7 @@
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import Avatar from "../../../ui/Avatar";
 import ArrowCircle from "../../../vectors/ArrowCircle";
-import Home, { Calling, Profile } from "../../../vectors/Home";
+import Home, { Calling, Money, Profile } from "../../../vectors/Home";
 import classNames from "classnames";
 import { useAuth } from "../../../../context/userManager";
 import { useEffect, useRef, useState } from "react";
@@ -32,6 +32,12 @@ const MENUP_TWO = [
     title: "Profile",
     icon: <Profile />,
     path: "/dashboard/profile",
+    counter: 0,
+  },
+  {
+    title: "Subscription",
+    icon: <Money />,
+    path: "/dashboard/subscription",
     counter: 0,
   },
   {
