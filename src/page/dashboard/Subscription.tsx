@@ -1,11 +1,14 @@
 import { CheckCircleIcon } from "@heroicons/react/16/solid";
 import classNames from "classnames";
+import { useFlutterwave } from "flutterwave-react-v3";
 import { useRef, useState } from "react";
 import { useOnClickOutside } from "usehooks-ts";
+import { useAuth } from "../../context/userManager";
 import Close from "../../components/vectors/Close";
-import { FiX } from "react-icons/fi";
+import { toast } from "react-hot-toast";
 
 export default function Subscription() {
+  const { user }: any = useAuth();
   const includedFeatures = [
     "Private forum access",
     "Member resources",
@@ -14,8 +17,7 @@ export default function Subscription() {
   ];
 
   const [showPop, setShowPop] = useState(false);
-
-  const [paymentSym, setPaymentSym] = useState<string | undefined>();
+  const [payNumber, setPayNumber] = useState("");
 
   const ref = useRef(null);
 
@@ -26,16 +28,39 @@ export default function Subscription() {
   useOnClickOutside(ref, handleClickOutside);
 
   const [loading, setLoading] = useState(false);
+  const config = {
+    public_key: 'FLWPUBK_TEST-985acfb91504fffd088fda074b9656eb-X',
+    tx_ref: Date.now().toString(),
+    amount: 300,
+    currency: 'RWF',
+    payment_options: 'card,mobilemoney,ussd',
+    customer: {
+      email: user.email,
+      phone_number: payNumber,
+      name: user.email.split("@")[0],
+    },
+    customizations: {
+      title: 'Neab',
+      description: 'Neab Payment',
+      logo: 'https://neab.vercel.app/logo.png',
+    },
+  };
+  const handleFlutterPayment = useFlutterwave(config);
 
   const handlePay = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
       setShowPop(false);
-      window.open(
-        "https://payments.paypack.rw/link/plink_6wPa39husFXVEme7ZWOA",
-        "_blank"
-      );
+      handleFlutterPayment({
+        callback: (response) => {
+          console.log(response);
+          toast.success("Payment successful");
+        },
+        onClose: () => {
+          toast.error("Payment closed");
+        },
+      });
     }, 3000);
   };
 
@@ -164,116 +189,13 @@ export default function Subscription() {
                 </button>
               </div>
             </div>
-            <div className="flex flex-col px-8 mt-6 gap-1">
-              <span>Select the method:</span>
-              <div className="flex items-center gap-4">
-                <div
-                  onClick={() => setPaymentSym("mtn")}
-                  className={classNames({
-                    "rounded-md gap-4 cursor-pointer w-full py-2.5 px-4 flex items-center justify-between transition-all duration-300":
-                      true,
-                    "bg-[#EDEEF2]": paymentSym !== "mtn",
-                    "bg-[#63bcff]": paymentSym === "mtn",
-                  })}
-                >
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/9/93/New-mtn-logo.jpg"
-                    alt=""
-                    width={35}
-                    height={35}
-                    className="w-[35px] h-[35px] rounded-full overflow-hidden object-cover"
-                  />
-                  <div className="flex flex-col gap-1">
-                    <p
-                      className={classNames({
-                        "leading-none font-light text-[16px]": true,
-                        "text-[#63bcff]": paymentSym !== "mtn",
-                        "text-white": paymentSym === "mtn",
-                      })}
-                    >
-                      Mobile Money
-                    </p>
-                    <p
-                      className={classNames({
-                        "leading-none font-light text-[13px]": true,
-                        "text-[#9c9c9c]": paymentSym !== "mtn",
-                        "text-white": paymentSym === "mtn",
-                      })}
-                    >
-                      MTN
-                    </p>
-                  </div>
-                  <FiX
-                    onClick={(e) => {
-                      if (paymentSym === "mtn") {
-                        setPaymentSym(undefined);
-                        e.stopPropagation();
-                      }
-                    }}
-                    className={classNames({
-                      "text-white": paymentSym === "mtn",
-                      "text-transparent": paymentSym !== "mtn",
-                    })}
-                  />
-                </div>
-                <div
-                  onClick={() => setPaymentSym("airtel")}
-                  className={classNames({
-                    "rounded-md gap-4 cursor-pointer w-full py-2.5 px-4 flex items-center justify-between transition-all duration-300":
-                      true,
-                    "bg-[#EDEEF2]": paymentSym !== "airtel",
-                    "bg-[#63bcff]": paymentSym === "airtel",
-                  })}
-                >
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Airtel_logo-01.png"
-                    alt=""
-                    width={35}
-                    height={35}
-                    className="w-[35px] h-[35px] rounded-full overflow-hidden object-cover"
-                  />
-                  <div className="flex flex-col gap-1">
-                    <p
-                      className={classNames({
-                        "leading-none font-light text-[16px]": true,
-                        "text-[#63bcff]": paymentSym !== "airtel",
-                        "text-white": paymentSym === "airtel",
-                      })}
-                    >
-                      Mobile Money
-                    </p>
-                    <p
-                      className={classNames({
-                        "leading-none font-light text-[13px]": true,
-                        "text-[#9c9c9c]": paymentSym !== "airtel",
-                        "text-white": paymentSym === "airtel",
-                      })}
-                    >
-                      Airtel
-                    </p>
-                  </div>
-                  <FiX
-                    onClick={(e) => {
-                      if (paymentSym === "airtel") {
-                        setPaymentSym(undefined);
-                        e.stopPropagation();
-                      }
-                    }}
-                    className={classNames({
-                      "text-white": paymentSym === "airtel",
-                      "text-transparent": paymentSym !== "airtel",
-                    })}
-                  />
-                </div>
-              </div>
-            </div>
-
             <div className="px-8 mt-6 flex flex-col gap-4">
               <div className="flex flex-col gap-1">
                 <span>Phone Number:</span>
                 <input
                   type="email"
                   name="email"
+                  onChange={(e) => setPayNumber(e.target.value)}
                   placeholder="Enter your phone number"
                   className={classNames({
                     "bg-[#E8E8EA] w-full py-4 px-6 rounded-2xl border focus:border-black focus:outline-none transition-all placeholder:font-light placeholder:text-[17px] placeholder:text-[#BBBABF] ":
@@ -294,7 +216,12 @@ export default function Subscription() {
               </div>
               <button
                 disabled={loading}
-                onClick={handlePay}
+                onClick={()=>{
+                  if(!payNumber){
+                    toast.error("Please enter your phone number")
+                  }
+                  handlePay()
+                }}
                 type="button"
                 className="w-full py-4 mb-8 rounded-2xl text-white font-semibold text-lg transition-all duration-300 bg-[#63bcff]"
               >
