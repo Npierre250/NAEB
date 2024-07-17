@@ -68,7 +68,7 @@ export default function Login() {
                   Member verification
                 </h4>
                 <p className="text-white text-start">
-                  Check if you are already member of nae system
+                  Check if you are already member of nae syste
                 </p>
               </button>
               <button
