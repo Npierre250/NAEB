@@ -32,4 +32,5 @@ export const applicationSchema = z.object({
       message:
         "Please enter a valid phone number in the format +250 7XX XXX XXX.",
     }),
+    email:z.string()
 });

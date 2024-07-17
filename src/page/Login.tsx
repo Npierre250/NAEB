@@ -8,16 +8,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Logo from "../components/ui/Logo";
 import { useState } from "react";
-import { useAuth } from "../context/userManager";
+
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6).max(50),
 });
+
 type ValidationSchema = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
-  const { login }: any = useAuth();
   const navigate = useNavigate();
 
   const {
@@ -28,13 +28,29 @@ export default function Login() {
   } = useForm<ValidationSchema>({
     resolver: zodResolver(loginSchema),
   });
+
   const onSubmit = async (data: any) => {
     try {
       setIsLoading(true);
-      await login({
-        email: data.email,
-        password: data.password,
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_REACT_APP_API_URL}/users/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to log in");
+      }
+
+      localStorage.setItem("user", JSON.stringify(result.user)); // Save user data to localStorage
+      localStorage.setItem("token", result.token); // Save token to localStorage
       navigate("/dashboard");
     } catch (error: any) {
       setError("password", {
@@ -49,12 +65,13 @@ export default function Login() {
       setIsLoading(false);
     }
   };
+
   return (
     <div className="flex h-screen">
       <div className="relative bg-[#287BCB] hidden md:block md:max-w-lg w-full">
-        <div className="w-[80%] mx-auto mt-10">
-          <Logo />
-          <div className="flex relative z-50 max-w-[320px] h-full mt-32">
+        <div className="w-[100%] mx-auto mt-10 flex flex-col justify-between h-[50%] px-7">
+            <Logo />
+          {/* <div className="flex relative z-50 max-w-[320px] h-full mt-32">
             <div>
               <FormStep className="w-[126px] h-[332px]" />
             </div>
@@ -68,7 +85,7 @@ export default function Login() {
                   Member verification
                 </h4>
                 <p className="text-white text-start">
-                  Check if you are already member of nae syste
+                  Check if you are already member of nae system
                 </p>
               </button>
               <button
@@ -94,9 +111,15 @@ export default function Login() {
                 </p>
               </button>
             </div>
-          </div>
+          </div> */}
+          <h1 className="text-5xl font-bold text-white">
+            LogIn Here,
+            <br />
+            <br />
+            For more experience
+          </h1>
         </div>
-        <CircleSvg className="absolute bottom-0 left-0 hidden md:block" />
+        {/* <CircleSvg className="absolute bottom-0 left-0 hidden md:block" /> */}
       </div>
       <div className="w-full h-full flex items-center justify-center relative flex-col sm:flex-row">
         <div className="max-w-md w-full px-4">

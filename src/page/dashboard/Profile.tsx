@@ -1,7 +1,8 @@
 import { useAuth } from "../../context/userManager";
+import getUserInfo from "../../utils/getUserInfo";
 
 export default function Profile() {
-  const { user }: any = useAuth();
+  const user:any=getUserInfo()
   return (
     <main className="profile-page">
       <section className="relative block h-500-px">
@@ -54,11 +55,11 @@ export default function Profile() {
               </div>
               <div className="text-center mt-20 ml-8">
                 <h3 className="text-4xl font-semibold leading-normal text-blueGray-700 mb-2">
-                  {user.email.split("@")[0]}
+                  {user.data.name}
                 </h3>
                 <div className="text-sm leading-normal mt-0 mb-2 text-blueGray-400">
                   <i className="fas fa-map-marker-alt mr-2 text-lg text-blueGray-400" />
-                  {user.email}
+                  {user.data.email}
                 </div>
               </div>
               <div className="mt-10 py-5 text-center"></div>

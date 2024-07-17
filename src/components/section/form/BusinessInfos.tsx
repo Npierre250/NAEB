@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import classNames from "classnames";
 import Input from "../../ui/Input";
 import Dropzone from "react-dropzone";
@@ -9,9 +8,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useContext, useState } from "react";
 import { ApplicatioinContext } from "../../../context/Application";
 import { applicationSchema } from "../../../types/zod";
+
 const businessInfoSchema = z.object({
   tinNumber: z.string().min(1).max(50),
 });
+
 type ValidationSchema = z.infer<typeof businessInfoSchema>;
 
 export default function BusinessInfos(props: any) {
@@ -22,14 +23,18 @@ export default function BusinessInfos(props: any) {
   } = useForm<ValidationSchema>({
     resolver: zodResolver(businessInfoSchema),
   });
+  const [isLoading, setIsLoading] = useState(false);
   const [{ files, error }, setDropzone] = useState<any>({
     files: props.licenceCopy,
     error: null,
   });
+
   const { next } = useContext(ApplicatioinContext);
   const [errorsMsg, setErrors] = useState({});
   const errorrArr = Object.entries(errorsMsg);
-  const onSubmit = (data: any) => {
+
+  const onSubmit = async (data: any) => {
+    setIsLoading(true)
     if (!files) {
       setDropzone({
         files: null,
@@ -37,32 +42,69 @@ export default function BusinessInfos(props: any) {
       });
       return;
     }
+
     props.updateFields({
       tinNumber: data.tinNumber,
       licenceCopy: files,
     });
+
     const validationResult = applicationSchema.safeParse({
       ...props,
       tinNumber: data.tinNumber,
       licenceCopy: files,
     });
+
     if (validationResult.success) {
       console.log("User object is valid:", validationResult.data);
-      next();
+
+      const formData = new FormData();
+      formData.append("tinNumber", data.tinNumber);
+      formData.append("licenceCopy", files[0]);
+
+      // Append other necessary fields from props
+      formData.append("idNumber", props.idNumber);
+      formData.append("name", props.name);
+      formData.append("email", props.email);
+      formData.append("phoneNumber", props.phoneNumber);
+      formData.append("farmLocation", props.farmLocation);
+      formData.append("farmLength", props.farmLength);
+      formData.append("productionSeason", props.productionSeason);
+      formData.append("desiredProducts", props.desiredProducts);
+
+      try {
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/applications`, {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          console.log("Application created successfully:", result);
+          next();
+        } else {
+          console.log("Error creating application:", result);
+          setErrors(result.errors);
+        }
+      } catch (error) {
+        console.error("Error submitting application:", error);
+        setErrors({ server: "Server error. Please try again later." });
+      }
+      finally{
+        setIsLoading(false);
+      }
     } else {
       setErrors(validationResult.error.flatten().fieldErrors);
       console.log("User object is invalid:", validationResult.error.flatten());
     }
   };
+
   return (
-    <form
-      className="mt-8 flex flex-col gap-6"
-      onSubmit={handleSubmit(onSubmit)}
-    >
+    <form className="mt-8 flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)}>
       <Input
         label="Tin number"
-        placeholder="Enter your full names"
-        type="Tin"
+        placeholder="Enter your TIN number"
+        type="text"
         name="tinNumber"
         defaultValue={props.tinNumber}
         errors={errors}
@@ -79,15 +121,14 @@ export default function BusinessInfos(props: any) {
         {({ getRootProps, getInputProps, isDragAccept, isFocused }) => (
           <div>
             <label
-              htmlFor={"Export licence copy"}
+              htmlFor="Export licence copy"
               className="block capitalize text-[17px] mb-1"
             >
               Export licence copy
             </label>
             <section
               className={classNames({
-                "bg-[#E8E8EA] flex justify-center items-center h-[107px] rounded-2xl border transition-all cursor-pointer":
-                  true,
+                "bg-[#E8E8EA] flex justify-center items-center h-[107px] rounded-2xl border transition-all cursor-pointer": true,
                 "border-black": isDragAccept || isFocused,
                 "border-red-500": error,
                 "border-[#287BCB]": isDragAccept,
@@ -97,10 +138,7 @@ export default function BusinessInfos(props: any) {
                 {...getRootProps({ defaultValue: props.licenceCopy })}
                 className=" w-full h-full flex items-center flex-col justify-center"
               >
-                <input
-                  {...getInputProps()}
-                  defaultValue={props.licenceCopy[0]?.filename}
-                />
+                <input {...getInputProps()} />
                 {error ? (
                   <p className="text-red-500 text-sm text-center w-1/2">
                     {error}
@@ -134,7 +172,7 @@ export default function BusinessInfos(props: any) {
       </Dropzone>
       {errorrArr.length > 0 && (
         <div
-          className="flex p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 "
+          className="flex p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50"
           role="alert"
         >
           <svg
@@ -159,10 +197,14 @@ export default function BusinessInfos(props: any) {
           </div>
         </div>
       )}
-
       <button
         type="submit"
-        className="py-3 bg-[#287BCB] px-9 rounded-2xl text-white w-full mt-3"
+        className={classNames({
+          "py-3 bg-[#287BCB] px-9 rounded-2xl text-white w-full mt-3":
+            true,
+          "opacity-100 ": !isLoading,
+          "opacity-20 cursor-wait": isLoading,
+        })}
       >
         Apply now
       </button>

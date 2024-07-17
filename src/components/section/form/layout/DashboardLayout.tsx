@@ -3,9 +3,10 @@ import Avatar from "../../../ui/Avatar";
 import ArrowCircle from "../../../vectors/ArrowCircle";
 import Home, { Calling, Money, Profile } from "../../../vectors/Home";
 import classNames from "classnames";
-import { useAuth } from "../../../../context/userManager";
 import { useEffect, useRef, useState } from "react";
 import { useOnClickOutside } from "usehooks-ts";
+import getUserInfo from "../../../../utils/getUserInfo";
+import { TbReportSearch } from "react-icons/tb";
 
 const MENUP_ONE = [
   {
@@ -14,19 +15,8 @@ const MENUP_ONE = [
     path: "/dashboard",
     counter: 1,
   },
-  // {
-  //   title: "Deliveries",
-  //   icon: <Delival />,
-  //   path: "/dashboard/deliveries",
-  //   counter: 0,
-  // },
-  // {
-  //   title: "Schedule",
-  //   icon: <Schedule />,
-  //   path: "/dashboard/schedule",
-  //   counter: 3,
-  // },
 ];
+
 const MENUP_TWO = [
   {
     title: "Profile",
@@ -41,6 +31,12 @@ const MENUP_TWO = [
     counter: 0,
   },
   {
+    title: "Report",
+    icon: <TbReportSearch size={30} />,
+    path: "/dashboard/reports",
+    counter: 0,
+  },
+  {
     title: "Calling",
     icon: <Calling />,
     path: "/dashboard/calling",
@@ -49,7 +45,7 @@ const MENUP_TWO = [
 ];
 
 export default function DashboardLayout() {
-  const { user, setUser }: any = useAuth();
+  const user = getUserInfo();
   const [addMenu, setAddMenu] = useState(false);
   const ref = useRef(null);
   const handleClickOutside = () => {
@@ -67,17 +63,44 @@ export default function DashboardLayout() {
     "Saturday",
   ];
 
-  async function logoutFunc() {
-    if (confirm("Are sure you want logout ??")) {
-      // await supabase.auth.signOut();
-      navigate("/");
-      setUser(null);
-    }
-  }
+  const monthsOfYear = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const getFormattedDate = () => {
+    const date = new Date();
+    const dayName = daysOfWeek[date.getDay()];
+    const day = date.getDate();
+    const month = monthsOfYear[date.getMonth()];
+    const year = date.getFullYear();
+    return `Today is ${dayName} ${day} ${month} ${year}`;
+  };
+
+  const [formattedDate, setFormattedDate] = useState(getFormattedDate());
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setFormattedDate(getFormattedDate());
+    }, 1000 * 60); // Update every minute
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   useEffect(() => {
     if (user === null) navigate("/");
   }, [user]);
+
   if (user === false) {
     return (
       <div className="flex items-center justify-center w-full h-screen bg-[#F6FAFF]">
@@ -85,9 +108,20 @@ export default function DashboardLayout() {
       </div>
     );
   }
+
+  // Remove the "Report" link if the user is not a super admin
+  const filteredMenuPTwo = user?.data?.role==="superAdmin"
+    ? MENUP_TWO
+    : MENUP_TWO.filter((item) => item.title !== "Report");
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
   if (user) {
     return (
-      <main className="bg-[#F6FAFF] w-full">
+      <main className="bg-[#F6FAFF] w-full overflow-x-scroll">
         <div className="bg-white z-50 fixed w-full">
           <div className="max-w-screen-2xl mx-auto px-4 flex items-center justify-between py-4">
             <div className="flex items-center gap-32">
@@ -97,11 +131,10 @@ export default function DashboardLayout() {
               <div className="flex items-center gap-4">
                 <div className="flex space-y-2 flex-col">
                   <span className="font-semibold text-base capitalize">
-                    Hi, {user.email.split("@")[0]}
+                    Hi, {user.data.name}
                   </span>
                   <span className="text-[#615E69] text-sm capitalize">
-                    Today is {daysOfWeek[new Date().getDay()] || "Sunday"}{" "}
-                    {new Date().getDate()} September 2023
+                    {formattedDate}
                   </span>
                 </div>
               </div>
@@ -111,7 +144,7 @@ export default function DashboardLayout() {
                 className="flex items-center gap-4 cursor-pointer"
                 onClick={() => setAddMenu(true)}
               >
-                <Avatar title={user.email.split("@")[0]} subTitle="Kicukiro" />
+                <Avatar title={user.data.name} subTitle="Kicukiro" />
                 <ArrowCircle />
               </div>
               {addMenu && (
@@ -129,7 +162,10 @@ export default function DashboardLayout() {
                       Profile
                     </Link>
                   </button>
-                  <button onClick={logoutFunc} className="w-full text-left">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left"
+                  >
                     Logout
                   </button>
                 </div>
@@ -138,7 +174,7 @@ export default function DashboardLayout() {
           </div>
         </div>
         <div className="flex h-full">
-          <div className="bg-white pt-24 fixed w-[300px] h-full">
+          <div className="bg-white pt-24 fixed w-[300px] h-full z-50">
             <div className="flex flex-col items-center gap-1">
               {MENUP_ONE.map((item, index) => {
                 return (
@@ -175,7 +211,7 @@ export default function DashboardLayout() {
               })}
             </div>
             <div className="flex flex-col items-center gap-1 mt-10">
-              {MENUP_TWO.map((item, index) => {
+              {filteredMenuPTwo.map((item, index) => {
                 return (
                   <NavLink to={item.path} style={{ width: "100%" }} key={index}>
                     {({ isActive }) => (

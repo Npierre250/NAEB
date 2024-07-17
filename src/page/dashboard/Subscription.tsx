@@ -1,14 +1,15 @@
 import { CheckCircleIcon } from "@heroicons/react/16/solid";
 import classNames from "classnames";
-import { useFlutterwave } from "flutterwave-react-v3";
+import { closePaymentModal, FlutterWaveButton, useFlutterwave } from "flutterwave-react-v3";
 import { useRef, useState } from "react";
 import { useOnClickOutside } from "usehooks-ts";
-import { useAuth } from "../../context/userManager";
 import Close from "../../components/vectors/Close";
 import { toast } from "react-hot-toast";
+import getUserInfo from "../../utils/getUserInfo";
+import axios from "axios";
 
 export default function Subscription() {
-  const { user }: any = useAuth();
+  const user:any=getUserInfo()
   const includedFeatures = [
     "Private forum access",
     "Member resources",
@@ -29,15 +30,15 @@ export default function Subscription() {
 
   const [loading, setLoading] = useState(false);
   const config = {
-    public_key: 'FLWPUBK_TEST-985acfb91504fffd088fda074b9656eb-X',
+    public_key: 'FLWPUBK_TEST-cd7e40ef021af3b02cdb4391b5c08f37-X',
     tx_ref: Date.now().toString(),
     amount: 300,
     currency: 'RWF',
     payment_options: 'card,mobilemoney,ussd',
     customer: {
-      email: user.email,
+      email: user.data.email,
       phone_number: payNumber,
-      name: user.email.split("@")[0],
+      name: user.data.name,
     },
     customizations: {
       title: 'Neab',
@@ -45,23 +46,36 @@ export default function Subscription() {
       logo: 'https://neab.vercel.app/logo.png',
     },
   };
-  const handleFlutterPayment = useFlutterwave(config);
+  const token=localStorage.getItem("token")
+  console.log("token===",token)
+  const fwConfig = {
+    ...config,
+    text: 'Pay Now',
+    callback: async (response: any) => {
+      console.log(response);
 
-  const handlePay = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setShowPop(false);
-      handleFlutterPayment({
-        callback: (response) => {
-          console.log(response);
-          toast.success("Payment successful");
-        },
-        onClose: () => {
-          toast.error("Payment closed");
-        },
-      });
-    }, 3000);
+      try {
+        await axios.post(`${import.meta.env.VITE_REACT_APP_API_URL}/subscription`, {
+          userId: user.data._id,
+          //  '6655dd888ea19671cd4a9d7e', // Replace with actual user ID
+          amount: 300,
+          currency: 'RWF',
+          beneficiaryName: 'kairosmartial', 
+          sender: 'Flutterwave Developers',
+          senderCountry: 'RWF',
+          mobileNumber: '23457558595'
+        },{
+          headers:{
+            Authorization: `Bearer ${token}`,
+          }
+        });
+
+        closePaymentModal();
+      } catch (error) {
+        console.error('Subscription creation failed:', error);
+      }
+    },
+    onClose: () => {},
   };
 
   return (
@@ -202,31 +216,9 @@ export default function Subscription() {
                       true,
                   })}
                 />
-                <button type="button" className="flex gap-2 items-center">
-                  <div
-                    className={classNames({
-                      "w-4 h-4 bg-primary rounded-full transition-all duration-100 delay-100":
-                        true,
-                    })}
-                  ></div>
-                  <span className="text-sm">
-                    You are paying <b>3,00,000 Frw</b>
-                  </span>
-                </button>
+                  <FlutterWaveButton {...fwConfig} />
               </div>
-              <button
-                disabled={loading}
-                onClick={()=>{
-                  if(!payNumber){
-                    toast.error("Please enter your phone number")
-                  }
-                  handlePay()
-                }}
-                type="button"
-                className="w-full py-4 mb-8 rounded-2xl text-white font-semibold text-lg transition-all duration-300 bg-[#63bcff]"
-              >
-                {loading ? "Processing..." : "Pay Now"}
-              </button>
+              
             </div>
           </div>
         </div>

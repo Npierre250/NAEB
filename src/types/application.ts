@@ -1,5 +1,6 @@
 export interface Application {
   name: string;
+  email:string;
   idNumber: number | string;
   phoneNumber: string | number;
   farmLocation: string;

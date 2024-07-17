@@ -13,14 +13,15 @@ import DashboardLayout from "./components/section/form/layout/DashboardLayout";
 import DashboardHome from "./page/dashboard/DashboardHome";
 import Schedule from "./page/dashboard/Schedule";
 import DashboardUserHome from "./page/dashboard/DashboardUserHome";
-import { useAuth } from "./context/userManager";
 import Profile from "./page/dashboard/Profile";
 import Calling from "./page/dashboard/Calling";
 import { Toaster } from "react-hot-toast";
 import Subscription from "./page/dashboard/Subscription";
+import getUserInfo from "./utils/getUserInfo";
+import OperationReport from "./page/dashboard/OperationReport";
 
 function App() {
-  const { user }: any = useAuth();
+  const user:any=getUserInfo();
   const router = createBrowserRouter(
     createRoutesFromElements(
       <>
@@ -32,7 +33,7 @@ function App() {
           <Route
             index
             element={
-              user?.email !== "admin@gmail.com" ? (
+              user?.data.email !== "calvinusbukaran@gmail.com" ? (
                 <DashboardUserHome />
               ) : (
                 <DashboardHome />
@@ -41,6 +42,7 @@ function App() {
           />
           <Route path="schedule" element={<Schedule />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="reports" element={<OperationReport/>}/>
           <Route path="calling" element={<Calling />} />
           <Route path="subscription" element={<Subscription />} />
           {/* <Route path="deliveries" element={<DashboardUserHome />} /> */}

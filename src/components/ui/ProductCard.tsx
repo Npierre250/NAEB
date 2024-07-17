@@ -1,107 +1,119 @@
-import { useRef, useState } from "react";
-import { useOnClickOutside } from "usehooks-ts";
-import Close from "../vectors/Close";
-import { supabase } from "../../supabase/client";
-import classNames from "classnames";
-import { toast } from "react-hot-toast";
-export default function ProductCard({ data, setDelivery }: any) {
-  const [loading, setLoading] = useState(false);
+import React, { useState, useRef } from 'react';
+import classNames from 'classnames';
+import toast from 'react-hot-toast';
+
+type Status = 'pending' | 'approved' | 'rejected';
+
+interface Delivery {
+  _id: string;
+  username: string;
+  userEmail: string;
+  productTitle: string;
+  productWeight: number;
+  deliveryTime: string;
+  reminder: string;
+  status: Status;
+}
+
+const ProductCard: React.FC<{ delivery: Delivery }> = ({ delivery }) => {
+  const { _id, productTitle, productWeight, deliveryTime, reminder, status } = delivery;
   const [addMenu, setAddMenu] = useState(false);
-  const [product_name, setProduct_name] = useState(data.product_name);
-  const [quantity, setQuantity] = useState(data.quantity);
-  const [delivery_date, setDelivery_date] = useState(data.delivery_date);
+  const [loading, setLoading] = useState(false);
+  const [product_name, setProduct_name] = useState(productTitle);
+  const [quantity, setQuantity] = useState(productWeight.toString());
+  const [delivery_date, setDelivery_date] = useState(deliveryTime.split('T')[0]); // Format date as YYYY-MM-DD
   const ref = useRef(null);
 
-  const handleClickOutside = () => {
-    setAddMenu(false);
+  const statusColors: Record<Status, string> = {
+    pending: 'bg-yellow-100 text-yellow-800',
+    approved: 'bg-green-100 text-green-800',
+    rejected: 'bg-red-100 text-red-800',
   };
-  useOnClickOutside(ref, handleClickOutside);
 
-  async function deleteFunc() {
-    alert("Are you sure you want to delete this delivery ??");
+  const updateDelivery = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      await supabase.from("delivery").delete().eq("id", data.id).select();
-      setDelivery((prev: any) => {
-        return prev.filter((value: any) => value.id !== data.id);
+      const token = localStorage.getItem('token'); 
+      const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/schedules/${_id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productTitle: product_name,
+          productWeight: quantity,
+          deliveryTime: delivery_date,
+          reminder,
+        }),
       });
-      toast.success("Delivery deleted successfully");
-    } catch (error: any) {
-      toast.success(error.message);
-    } finally {
-      setLoading(false);
-    }
-  }
 
-  async function updateDelivery() {
-    if (
-      product_name === "" ||
-      quantity === "" ||
-      delivery_date === "" ||
-      !product_name ||
-      !quantity ||
-      !delivery_date
-    ) {
-      return;
-    }
-    try {
-      setLoading(true);
-      await supabase
-        .from("delivery")
-        .update({
-          product_name,
-          quantity,
-          delivery_date,
-        })
-        .eq("id", data.id)
-        .select();
-      setDelivery((prev: any) => {
-        return prev.map((value: any) => {
-          if (value.id === data.id) {
-            return {
-              ...value,
-              product_name,
-              quantity,
-              delivery_date,
-            };
-          }
-          return value;
-        });
-      });
+      if (!response.ok) {
+        throw new Error('Failed to update schedule');
+      }
+
+
+      const data = await response.json();
+      console.log(data);
+      toast.success("product updated successfully!!")
+      window.location.reload()
       setAddMenu(false);
     } catch (error) {
-      alert("Error updating delivery");
+      console.error(error);
     } finally {
       setLoading(false);
     }
-  }
+  };
+
+  const deleteFunc = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token'); 
+      const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/schedules/${_id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete schedule');
+      }
+      toast.success('Schedule deleted successfully');
+      window.location.reload(); // Reload the page after successful deletion
+      
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="border border-[#F3F3F3] rounded-md px-4 py-3 h-fit">
+    <div className="border border-[#F3F3F3] rounded-md px-4 py-3 h-fit bg-white shadow-md w-fit">
       <div className="flex justify-between items-center">
         <div className="flex flex-col">
           <span className="text-[#615E69] text-sm capitalize">Product</span>
           <span className="font-normal text-sm capitalize inline-flex items-center gap-2">
-            {data.product_name}
+            {productTitle}
           </span>
         </div>
-        <span className="text-[#00A0DE] text-sm font-semibold capitalize">
-          {data.status}
+        <span className={`text-sm font-semibold capitalize ${statusColors[status]}`}>
+          {status}
         </span>
       </div>
       <div className="flex items-center justify-between mt-4">
         <div className="flex flex-col">
           <span className="text-[#615E69] text-sm capitalize">Quantity</span>
           <span className="font-normal text-sm capitalize inline-flex items-center gap-2">
-            {data.quantity}Kg
+            {productWeight} kg
           </span>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex flex-col">
-            <span className="text-[#615E69] text-sm capitalize">
-              Delivery date
-            </span>
+            <span className="text-[#615E69] text-sm capitalize">Delivery date</span>
             <span className="font-normal text-sm capitalize inline-flex items-center gap-2">
-              {data.delivery_date}
+              {new Date(deliveryTime).toLocaleDateString()}
             </span>
           </div>
 
@@ -120,25 +132,25 @@ export default function ProductCard({ data, setDelivery }: any) {
                 <div className="flex justify-between mb-3">
                   <span>Update deliveries</span>
                   <button onClick={() => setAddMenu(false)}>
-                    <Close />
+                    <span>&times;</span> {/* Replace with an icon or SVG */}
                   </button>
                 </div>
                 <input
                   onChange={(e) => setProduct_name(e.target.value)}
                   value={product_name}
                   className="border px-2 py-1.5 rounded-lg placeholder:text-black/70 outline-none"
-                  placeholder="Add product naame"
+                  placeholder="Add product name"
                 />
                 <input
                   onChange={(e) => setQuantity(e.target.value)}
                   value={quantity}
                   type="number"
                   className="border px-2 py-1.5 rounded-lg placeholder:text-black/70 outline-none"
-                  placeholder="Products quantity"
+                  placeholder="Product quantity"
                 />
                 <input
                   onChange={(e) => setDelivery_date(e.target.value)}
-                  placeholder={"Delivery date"}
+                  placeholder="Delivery date"
                   value={delivery_date}
                   className="border px-2 py-1.5 rounded-lg placeholder:text-black/70 outline-none"
                   type="date"
@@ -147,15 +159,14 @@ export default function ProductCard({ data, setDelivery }: any) {
                 <div className="flex gap-2 items-center mx-auto mt-3">
                   <button
                     onClick={() => setAddMenu(false)}
-                    className="px-6 py-2  rounded-full text-sm transition-all duration-300 text-[#A7A7A7] bg-[#FCFBFB]"
+                    className="px-6 py-2 rounded-full text-sm transition-all duration-300 text-[#A7A7A7] bg-[#FCFBFB]"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={updateDelivery}
                     className={classNames({
-                      "px-6 py-2  rounded-full text-sm transition-all duration-300 text-white bg-[#287BCB] ":
-                        true,
+                      "px-6 py-2 rounded-full text-sm transition-all duration-300 text-white bg-[#287BCB]": true,
                       "cursor-wait opacity-60": loading,
                     })}
                   >
@@ -175,4 +186,6 @@ export default function ProductCard({ data, setDelivery }: any) {
       </div>
     </div>
   );
-}
+};
+
+export default ProductCard;

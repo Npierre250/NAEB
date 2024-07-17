@@ -1,139 +1,143 @@
+import React, { useEffect, useState } from 'react';
+import ProductCard from '../../components/ui/ProductCard';
+import Loader from '../../components/Loader';
+import { toast } from 'react-hot-toast';
+import getUserInfo from '../../utils/getUserInfo';
 import classNames from "classnames";
-import { useEffect, useState } from "react";
-import ProductCard from "../../components/ui/ProductCard";
-import { supabase } from "../../supabase/client";
-import { useAuth } from "../../context/userManager";
-import Loader from "../../components/Loader";
-import { toast } from "react-hot-toast";
 
-export default function DashboardUserHome() {
+const DashboardUserHome = () => {
   const [loading, setLoading] = useState(false);
-  const [whichOne, setWhichOne] = useState(0);
-  const [backup, setBackup] = useState<any>([]);
-  const [delivery, setDelivery] = useState<any>([]);
-  const [product_name, setProduct_name] = useState<any>("");
-  const [quantity, setQuantity] = useState<any>("");
-  const [delivery_date, setDelivery_date] = useState<any>("");
-  const { user }: any = useAuth();
+  const [whichOne, setWhichOne] = useState<'all' | 'pending' | 'approved' | 'declined'>('all');
+  const [deliveries, setDeliveries] = useState<any[]>([]);
+  const [productTitle, setProductTitle] = useState<string>('');
+  const [productWeight, setProductWeight] = useState<number | ''>('');
+  const [deliveryTime, setDeliveryTime] = useState<string>('');
+  const [reminder, setReminder] = useState<string>('before 1h');
+  const user: any = getUserInfo(); // Assuming this function retrieves user info
 
-  const [loadingDeliveries, setloadingDeliveries] = useState(false);
+  const [loadingDeliveries, setLoadingDeliveries] = useState(false);
+
   useEffect(() => {
-    setloadingDeliveries(true);
-    if (user) {
-      const fetch = async () => {
-        let { data, error } = await supabase
-          .from("delivery")
-          .select("*")
-          .eq("user_name", user.email.split("@")[0]);
-        if (error) {
-          console.log(error);
+    const fetchData = async () => {
+      try {
+        setLoadingDeliveries(true);
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/schedules/user`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch deliveries');
         }
-        setDelivery(data);
-        setBackup(data);
-        setloadingDeliveries(false);
-      };
-      fetch();
+        const data = await response.json();
+        setDeliveries(data);
+      } catch (error) {
+        console.error('Fetch data error:', error);
+        toast.error('Failed to fetch deliveries');
+      } finally {
+        setLoadingDeliveries(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const filterDeliveries = () => {
+    switch (whichOne) {
+      case 'pending':
+        return deliveries.filter((del) => del.status === 'pending');
+      case 'approved':
+        return deliveries.filter((del) => del.status === 'approved');
+      case 'declined':
+        return deliveries.filter((del) => del.status === 'rejected');
+      default:
+        return deliveries;
     }
-  }, [user]);
+  };
 
-  console.log(delivery);
-
-  useEffect(() => {
-    setDelivery(() => {
-      if (whichOne === 0) {
-        return backup;
-      }
-      if (whichOne === 1) {
-        return backup.filter((value: any) => value.status === "pending");
-      }
-      if (whichOne === 2) {
-        return backup.filter((value: any) => value.status === "approved");
-      }
-      if (whichOne === 3) {
-        return backup.filter((value: any) => value.status === "declined");
-      }
-      return backup;
-    });
-  }, [whichOne]);
-
-  async function sumbitDelivery() {
-    if (
-      product_name === "" ||
-      quantity === "" ||
-      delivery_date === "" ||
-      !product_name ||
-      !quantity ||
-      !delivery_date
-    ) {
+  const submitDelivery = async () => {
+    if (!productTitle || !productWeight || !deliveryTime) {
+      toast.error('Please fill in all required fields.');
       return;
     }
+
     try {
       setLoading(true);
-      const dates = new Date(delivery_date);
-      const { data: resp }: any = await supabase
-        .from("delivery")
-        .insert([
-          {
-            product_name,
-            quantity,
-            delivery_date: `${
-              dates.getMonth() + 1
-            }/${dates.getDate()}/${dates.getFullYear()}`,
-            user_name: user.email.split("@")[0],
-          },
-        ])
-        .select();
-      delivery.push(...resp);
-      // clear all form inputs
-      setProduct_name("");
-      setQuantity("");
-      setDelivery_date("");
-      toast.success("Delivery added successfully");
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/schedules`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productTitle,
+          productWeight,
+          deliveryTime,
+          reminder,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create delivery');
+      }
+
+      // Fetch updated deliveries after successful submission
+      const updatedResponse = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/schedules/user`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      if (!updatedResponse.ok) {
+        throw new Error('Failed to fetch updated deliveries');
+      }
+
+      const updatedData = await updatedResponse.json();
+      setDeliveries(updatedData);
+
+      // Clear form inputs and notify success
+      setProductTitle('');
+      setProductWeight('');
+      setDeliveryTime('');
+      setReminder('before 1h');
+      toast.success('Delivery added successfully');
     } catch (error: any) {
+      console.error('Submit delivery error:', error);
       toast.error(error.message);
-      console.log(error);
     } finally {
       setLoading(false);
     }
-  }
+  };
+
+  const getTotalWeight = (status: string) => {
+    let totalWeight = 0;
+    deliveries.forEach((del) => {
+      if (del.status === status) {
+        totalWeight += del.productWeight;
+      }
+    });
+    return totalWeight;
+  };
 
   return (
     <div className="p-5">
       <div className="flex gap-4">
+        {/* Total Deliveries Card */}
         <div className="w-[400px] bg-white rounded-lg px-8 py-6 flex gap-5 flex-col">
           <span>Total deliveries</span>
-          <span className="font-semibold text-[30px]">
-            {backup
-              ? backup.reduce(
-                  (a: { quantity: any }, b: { quantity: any }) =>
-                    a + b.quantity,
-                  0
-                )
-              : "---"}
-            kg
-          </span>
+          <span className="font-semibold text-[30px]">{deliveries.length}</span>
           <div className="flex gap-4">
+            {/* Delivery Status Cards */}
             <div className="flex gap-2 items-center">
               <span className="w-0.5 h-full bg-[#00A0DE]" />
               <div className="flex flex-col">
-                <span className="text-[#615E69] text-sm capitalize">
-                  Pending
-                </span>
+                <span className="text-[#615E69] text-sm capitalize">Pending</span>
                 <span className="font-semibold text-sm capitalize inline-flex items-center gap-2">
-                  {backup
-                    .filter((value: any) => value.status === "pending")
-                    .reduce(
-                      (a: number, b: { quantity: number }) => a + b.quantity,
-                      0
-                    )}
-                  kg
+                  {getTotalWeight('pending')} kg
                   <span className="text-[9px] text-[#00A0DE] py-[1px] px-[4px] rounded-full bg-[#CDE8FD]">
-                    {(
-                      (backup.filter((value: any) => value.status === "pending")
-                        .length *
-                        100) /
-                      backup.length
-                    ).toFixed(0)}
                     %
                   </span>
                 </span>
@@ -142,26 +146,10 @@ export default function DashboardUserHome() {
             <div className="flex gap-2 items-center">
               <span className="w-0.5 h-full bg-[#00A0DE]" />
               <div className="flex flex-col">
-                <span className="text-[#615E69] text-sm capitalize">
-                  Approved
-                </span>
+                <span className="text-[#615E69] text-sm capitalize">Approved</span>
                 <span className="font-semibold text-sm capitalize inline-flex items-center gap-2">
-                  {backup
-                    .filter((value: any) => value.status === "approved")
-                    .reduce(
-                      (a: { quantity: any }, b: { quantity: any }) =>
-                        a + b.quantity,
-                      0
-                    )}
-                  kg
+                  {getTotalWeight('approved')} kg
                   <span className="text-[9px] text-[#00A0DE] py-[1px] px-[4px] rounded-full bg-[#CDE8FD]">
-                    {(
-                      (backup.filter(
-                        (value: any) => value.status === "approved"
-                      ).length *
-                        100) /
-                      backup.length
-                    ).toFixed(0)}
                     %
                   </span>
                 </span>
@@ -169,128 +157,118 @@ export default function DashboardUserHome() {
             </div>
           </div>
         </div>
+        {/* New Delivery Form */}
         <div className="bg-white rounded-lg px-8 py-6 flex gap-5 flex-col w-full">
           <h4 className="font-semibold text-[20px]">New delivery</h4>
           <div className="grid grid-cols-3 gap-10">
+            {/* Form Inputs */}
             <div className="flex flex-col gap-2">
-              <span className="font-light">Product name</span>
+              <span className="font-light">Product Title</span>
               <input
-                placeholder="Product name"
+                placeholder="Product Title"
                 required
-                value={product_name}
-                onChange={(e) => setProduct_name(e.target.value)}
+                value={productTitle}
+                onChange={(e) => setProductTitle(e.target.value)}
                 className="w-full py-3 px-3 outline-none border-none bg-[#F0F8FF] placeholder:text-[#CACACA] font-light"
               />
             </div>
             <div className="flex flex-col gap-2">
-              <span className="font-light">Quantity</span>
+              <span className="font-light">Product Weight</span>
               <input
-                placeholder="Quantity"
+                placeholder="Product Weight"
                 required
                 type="number"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
+                value={productWeight}
+                onChange={(e) => setProductWeight(Number(e.target.value))}
                 className="w-full py-3 px-3 outline-none border-none bg-[#F0F8FF] placeholder:text-[#CACACA] font-light"
               />
             </div>
             <div className="flex flex-col gap-2">
-              <span className="font-light">Delivery Date</span>
+              <span className="font-light">Delivery Time</span>
               <input
-                placeholder="Delivery Date"
+                placeholder="Delivery Time"
                 required
                 type="date"
-                value={delivery_date}
-                onChange={(e) => setDelivery_date(e.target.value)}
+                value={deliveryTime}
+                onChange={(e) => setDeliveryTime(e.target.value)}
                 className="w-full py-3 px-3 outline-none border-none bg-[#F0F8FF] placeholder:text-[#CACACA] font-light"
               />
             </div>
+            <div className="flex flex-col gap-2">
+              <span className="font-light">Reminder</span>
+              <select
+                value={reminder}
+                onChange={(e) => setReminder(e.target.value)}
+                className="w-full py-3 px-3 outline-none border-none bg-[#F0F8FF] placeholder:text-[#CACACA] font-light"
+              >
+                <option value="before 1h">Before 1 hour</option>
+                <option value="before 2h">Before 2 hours</option>
+                <option value="before 3h">Before 3 hours</option>
+              </select>
+            </div>
           </div>
+          {/* Submit Button */}
           <button
             disabled={loading}
-            onClick={sumbitDelivery}
+            onClick={submitDelivery}
             className={classNames({
-              "px-10 py-3 text-sm transition-all duration-300 text-white w-fit ml-auto bg-[#287BCB]":
-                true,
-              "cursor-wait opacity-60": loading,
+              'px-10 py-3 text-sm transition-all duration-300 text-white w-fit ml-auto bg-[#287BCB]': true,
+              'cursor-wait opacity-60': loading,
             })}
           >
             Add delivery
           </button>
         </div>
       </div>
-      <div className="rounded-lg  bg-white mt-4 px-8 py-6 w-full">
-        {delivery && (
-          <div className="flex items-center mb-4 border border-[#287BCB] w-fit m-0 p-0">
-            <button
-              onClick={() => setWhichOne(0)}
-              className={classNames({
-                "px-10 py-3 text-sm transition-all duration-300 text-[#287BCB] w-fit":
-                  true,
-                " bg-[#287BCB] text-white": whichOne === 0,
-              })}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setWhichOne(1)}
-              className={classNames({
-                "px-10 py-3 text-sm transition-all duration-300 border-x w-fit text-[#287BCB]":
-                  true,
-                "bg-[#287BCB] text-white border-transparent": whichOne === 1,
-                " border-[#287BCB]": whichOne !== 1,
-              })}
-            >
-              Pending
-            </button>
-            <button
-              onClick={() => setWhichOne(2)}
-              className={classNames({
-                "px-10 py-3 text-sm transition-all duration-300  w-fit text-[#287BCB]":
-                  true,
-                "bg-[#287BCB] text-white": whichOne === 2,
-              })}
-            >
-              Approved
-            </button>
-            <button
-              onClick={() => setWhichOne(3)}
-              className={classNames({
-                "px-10 py-3 text-sm border-l border-[#287BCB] transition-all duration-300  w-fit text-[#287BCB]":
-                  true,
-                "bg-[#287BCB] text-white": whichOne === 3,
-              })}
-            >
-              Declined
-            </button>
-          </div>
-        )}
-
-        {loadingDeliveries && (
-          <div className="flex w-full justify-center h-[300px]  items-center flex-col">
-            <Loader />
-          </div>
-        )}
-        {delivery?.length === 0 && !loadingDeliveries && (
-          <div className="flex w-full justify-center h-[300px]  items-center flex-col">
-            <p>You have no deliveries.</p>
-          </div>
-        )}
-        {delivery.length && !loading && (
-          <div className="grid grid-cols-3 gap-5">
-            {delivery.map((value: any, index: any) => {
-              return (
-                <>
-                  <ProductCard
-                    setDelivery={setDelivery}
-                    key={index}
-                    data={value}
-                  />
-                </>
-              );
+      {/* Delivery Filter Buttons */}
+      <div className="rounded-lg bg-white mt-4 px-8 py-6 w-full">
+        <div className="flex gap-2 rounded-lg bg-[#E1F0FF] text-[#287BCB] w-fit mx-auto my-4">
+          <button
+            onClick={() => setWhichOne('all')}
+            className={classNames({
+              'px-10 py-3 text-sm transition-all duration-300 text-[#287BCB] w-fit': true,
+              'bg-[#287BCB] text-white': whichOne === 'all',
             })}
-          </div>
-        )}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setWhichOne('pending')}
+            className={classNames({
+              'px-10 py-3 text-sm transition-all duration-300 border-x w-fit text-[#287BCB]': true,
+              'bg-[#287BCB] text-white': whichOne === 'pending',
+            })}
+          >
+            Pending
+          </button>
+          <button
+            onClick={() => setWhichOne('approved')}
+            className={classNames({
+              'px-10 py-3 text-sm transition-all duration-300 border-x w-fit text-[#287BCB]': true,
+              'bg-[#287BCB] text-white': whichOne === 'approved',
+            })}
+          >
+            Approved
+          </button>
+          <button
+            onClick={() => setWhichOne('declined')}
+            className={classNames({
+              'px-10 py-3 text-sm transition-all duration-300 text-[#287BCB] w-fit': true,
+              'bg-[#287BCB] text-white': whichOne === 'declined',
+            })}
+          >
+            Declined
+          </button>
+        </div>
+        {/* Displaying Deliveries */}
+        <div className="grid grid-cols-3 gap-4">
+          {filterDeliveries().map((delivery: any, index: number) => (
+            <ProductCard key={index} delivery={delivery} />
+          ))}
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default DashboardUserHome;
