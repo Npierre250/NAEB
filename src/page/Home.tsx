@@ -8,10 +8,13 @@ import BgHero from "../components/vectors/BgHero";
 import { Link, NavLink } from "react-router-dom";
 import Logo from "../components/ui/Logo";
 import { useAuth } from "../context/userManager";
+import getUserInfo from "../utils/getUserInfo";
 
 function Home() {
   const [active, setActive] = useState(1);
-  const { user }: any = useAuth();
+  const user=getUserInfo();
+
+  console.log("user===",user)
   const menu = [
     {
       id: 1,
@@ -32,12 +35,12 @@ function Home() {
       link: "/login",
       show: !user,
     },
-    {
-      id: 4,
-      name: "Sign up",
-      link: "/signup",
-      show: !user,
-    },
+    // {
+    //   id: 4,
+    //   name: "Sign up",
+    //   link: "/signup",
+    //   show: !user,
+    // },
     {
       id: 5,
       name: "Dashboard",
@@ -71,13 +74,13 @@ function Home() {
   ];
   return (
     <main>
-      <section className="bg-[#287BCB] pb-20 md:pb-0 md:h-[850px] relative">
-        <div className="absolute left-0 right-0 mx-auto bottom-0 w-fit z-50 hidden md:block">
-          <BgHero />
-        </div>
-        <CircleSvg className="absolute bottom-0 left-0 hidden md:block" />
-        <CircleSvgRight className="absolute bottom-0 right-0 hidden md:block " />
-        <div className="max-w-7xl mx-auto py-8 flex justify-between items-center px-3">
+      <section className="bg-[#287BCB] pb-20 md:pb-0 md:h-screen relative">
+        {/* <div className="absolute left-0 right-0 mx-auto bottom-0 w-fit z-50 hidden md:block"> */}
+          {/* <BgHero /> */}
+        {/* </div> */}
+        {/* <CircleSvg className="absolute bottom-0 left-0 hidden md:block" />
+        <CircleSvgRight className="absolute bottom-0 right-0 hidden md:block " /> */}
+        <div className="max-w-7xl mx-auto py-8 flex justify-between items-center px-10">
           <Logo />
           <div className=" hidden gap-12 md:flex">
             {menu.map((val) => {
@@ -105,7 +108,7 @@ function Home() {
             })}
           </div>
         </div>
-        <div className="flex justify-center items-center flex-col md:w-[40%] mx-auto mt-14 gap-6">
+        <div className="flex justify-center items-center flex-col md:w-[60%] mx-auto mt-14 gap-6">
           <p className="text-[23px] font-bold text-white">
             Growing Agricultural Exports
           </p>
@@ -128,15 +131,15 @@ function Home() {
           <mark className="bg-transparent text-[#287BCB]">Pack house </mark>{" "}
           work
         </h2>
-        <div className="grid md:grid-cols-2 gap-20 md:gap-[200px] mt-20">
-          <div className="grid gap-16">
+        <div className=" md:gap-[200px] mt-20">
+          <div className="grid gap-16 grid-cols-2 w-full">
             <div className="flex flex-col gap-4">
               <img
-                src="/card-1.png"
+                src="/capture002.JPG"
                 alt="packhouse"
                 width={520}
                 height={296}
-                className="w"
+                className="border-2 border-[#287BCB] rounded-lg"
               />
               <h4 className="text-xl font-bold">NAEB Member application</h4>
               <p>
@@ -152,11 +155,11 @@ function Home() {
             </div>
             <div className="flex flex-col gap-4">
               <img
-                src="/card-2.png"
+                src="/Capture003.JPG"
                 alt="packhouse"
                 width={520}
                 height={296}
-                className="w"
+                className="border-2 border-[#287BCB] rounded-lg"
               />
               <h4 className="text-xl font-bold"> Online Scheduling</h4>
               <p>
@@ -171,7 +174,7 @@ function Home() {
               </Link>
             </div>
           </div>
-          <div className="flex flex-col gap-4 m-auto">
+          {/* <div className="flex flex-col gap-4 m-auto">
             <img
               src="/card-3.png"
               alt="packhouse"
@@ -189,7 +192,7 @@ function Home() {
             >
               Register now
             </Link>
-          </div>
+          </div> */}
         </div>
       </section>
       <section className="bg-[#F6FBFF] py-12 mt-20" id="faq">

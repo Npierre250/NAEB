@@ -13,6 +13,7 @@ import Logo from "../components/ui/Logo";
 const INITIAL_DATA: Application = {
   name: "",
   idNumber: "",
+  email:"",
   phoneNumber: "",
   farmLocation: "",
   farmLength: "",
@@ -89,13 +90,13 @@ export default function ApplicationPage() {
             </div>
           </div>
         </div>
-        <CircleSvg className="absolute bottom-0 left-0 hidden md:block" />
+        {/* <CircleSvg className="absolute bottom-0 left-0 hidden md:block" /> */}
       </div>
-      <div className="w-full h-full flex items-center justify-center">
+      <div className="w-full h-full flex justify-center">
         {steps.length - 1 === currentStepIndex ? (
           <Done />
         ) : (
-          <div className="max-w-md w-full px-4">
+          <div className="px-24 w-full flex justify-center flex-col">
             <span className="text-[#287BCB] font-light">Packhouse</span>
             <h3 className="text-4xl font-bold text-[#287BCB] mb-1">
               Application

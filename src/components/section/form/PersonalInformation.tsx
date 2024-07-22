@@ -7,6 +7,7 @@ import { ApplicatioinContext } from "../../../context/Application";
 const personSchema = z.object({
   idNumber: z.string().min(16).max(16),
   name: z.string().min(3).max(50),
+  email:z.string(),
   phoneNumber: z
     .string()
     .regex(/^\+?(25)?0(\s)?-?7(\d){2}(\s|-)?(\d){3}(\s|-)?(\d){3}$/g),
@@ -17,6 +18,7 @@ export default function PersonalInformation({
   updateFields,
   idNumber,
   name,
+  email,
   phoneNumber,
 }: any) {
   const { next } = useContext(ApplicatioinContext);
@@ -32,6 +34,7 @@ export default function PersonalInformation({
     updateFields({
       name: data.name,
       idNumber: data.idNumber,
+      email:data.email,
       phoneNumber: data.phoneNumber,
     });
     next();
@@ -41,6 +44,7 @@ export default function PersonalInformation({
       className="mt-8 flex flex-col gap-6"
       onSubmit={handleSubmit(onSubmit)}
     >
+      <div className="grid grid-cols-2 gap-6">
       <Input
         label="Names"
         name="name"
@@ -48,6 +52,15 @@ export default function PersonalInformation({
         type="name"
         errors={errors}
         defaultValue={name}
+        register={register}
+      />
+      <Input
+        label="email"
+        name="email"
+        placeholder="Enter your email"
+        type="email"
+        errors={errors}
+        defaultValue={email}
         register={register}
       />
       <Input
@@ -68,6 +81,7 @@ export default function PersonalInformation({
         errors={errors}
         register={register}
       />
+      </div>
       <button
         type="submit"
         className="py-3 bg-[#287BCB] px-9 rounded-2xl text-white w-full mt-3"
